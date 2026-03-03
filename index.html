@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OpenClaw Mission Control</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #050508;
+            --accent: #00d2ff;
+            --accent-glow: rgba(0, 210, 255, 0.4);
+            --card-bg: rgba(255, 255, 255, 0.03);
+            --border-subtle: rgba(255, 255, 255, 0.06);
+            --text-primary: #ffffff;
+            --text-secondary: #a1a1aa;
+            --nav-bg: rgba(5, 5, 8, 0.7);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            font-family: 'Inter', sans-serif;
+            line-height: 1.6;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 var(--accent-glow); }
+            70% { box-shadow: 0 0 0 10px rgba(0, 210, 255, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(0, 210, 255, 0); }
+        }
+
+        .fade-in {
+            animation: fadeInUp 0.6s ease-out forwards;
+        }
+
+        /* Glassmorphism Utility */
+        .glass-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            transition: var(--transition);
+        }
+
+        .glass-card:hover {
+            border-color: var(--accent);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+        }
+
+        /* Layout */
+        header {
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            background: var(--nav-bg);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border-subtle);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-weight: 600;
+            font-size: 1.25rem;
+            letter-spacing: -0.5px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .status-indicator {
+            width: 10px;
+            height: 10px;
+            background: var(--accent);
+            border-radius: 50%;
+            display: inline-block;
+            animation: pulse 2s infinite;
+        }
+
+        .search-bar input {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-subtle);
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            color: white;
+            width: 300px;
+            outline: none;
+            transition: var(--transition);
+        }
+
+        .search-bar input:focus {
+            border-color: var(--accent);
+        }
+
+        main {
+            padding: 2rem;
+            max-width: 1600px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            gap: 1.5rem;
+        }
+
+        .section-title {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+            display: block;
+        }
+
+        /* Agent Roster */
+        #agent-roster {
+            grid-column: span 12;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1rem;
+        }
+
+        .agent-card {
+            padding: 1.5rem;
+        }
+
+        .agent-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+        }
+
+        .agent-name {
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .agent-role {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        .status-badge {
+            font-size: 0.7rem;
+            padding: 2px 8px;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .status-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+        }
+
+        .online .status-dot { background: #10b981; }
+        .busy .status-dot { background: #f59e0b; }
+        .offline .status-dot { background: #6b7280; }
+
+        .resource-metrics {
+            margin-top: 1rem;
+            font-size: 0.8rem;
+            display: flex;
+            gap: 15px;
+        }
+
+        .metric {
+            color: var(--text-secondary);
+        }
+
+        .metric span {
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+
+        /* Dispatcher */
+        #dispatcher {
+            grid-column: span 12;
+            padding: 1.5rem;
+        }
+
+        .dispatch-controls {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .dispatch-input {
+            flex-grow: 1;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-subtle);
+            padding: 1rem;
+            border-radius: 8px;
+            color: white;
+            font-family: inherit;
+            outline: none;
+        }
+
+        .dispatch-select {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-subtle);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            outline: none;
+        }
+
+        .dispatch-btn {
+            background: var(--accent);
+            color: var(--bg-primary);
+            border: none;
+            padding: 0 2rem;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .dispatch-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px var(--accent-glow);
+        }
+
+        /* Kanban Board */
+        #mission-control {
+            grid-column: span 8;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+        }
+
+        .kanban-col {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .kanban-item {
+            padding: 1rem;
+            font-size: 0.85rem;
+        }
+
+        .task-tag {
+            font-size: 0.7rem;
+            color: var(--accent);
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+
+        /* Telemetry Feed */
+        #telemetry {
+            grid-column: span 4;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .activity-feed {
+            flex-grow: 1;
+            max-height: 500px;
+            overflow-y: auto;
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .activity-item {
+            padding-bottom: 0.8rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            font-size: 0.8rem;
+        }
+
+        .activity-ts {
+            color: var(--text-secondary);
+            font-size: 0.7rem;
+            display: block;
+            margin-bottom: 2px;
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: var(--border-subtle); border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--text-secondary); }
+
+        @media (max-width: 1024px) {
+            #mission-control { grid-column: span 12; }
+            #telemetry { grid-column: span 12; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo">
+            <span class="status-indicator"></span>
+            MISSION CONTROL
+        </div>
+        <div class="search-bar">
+            <input type="text" placeholder="Search tasks, agents, or files...">
+        </div>
+        <div id="system-clock" style="font-variant-numeric: tabular-nums; font-size: 0.9rem; color: var(--text-secondary);"></div>
+    </header>
+
+    <main>
+        <!-- Agent Roster -->
+        <div style="grid-column: span 12;">
+            <span class="section-title">Agent Roster Grid</span>
+            <div id="agent-roster"></div>
+        </div>
+
+        <!-- Dispatcher -->
+        <div id="dispatcher" class="glass-card fade-in">
+            <span class="section-title">Request Dispatcher</span>
+            <div class="dispatch-controls">
+                <input type="text" id="task-input" class="dispatch-input" placeholder="Enter command or task request...">
+                <select id="agent-select" class="dispatch-select">
+                    <!-- Populated by JS -->
+                </select>
+                <button class="dispatch-btn" onclick="dispatchTask()">Dispatch Task</button>
+            </div>
+        </div>
+
+        <!-- Kanban Board -->
+        <div id="mission-control" class="fade-in" style="animation-delay: 0.2s;">
+            <div class="kanban-col">
+                <span class="section-title">Pending Assignment</span>
+                <div id="col-pending" class="kanban-container"></div>
+            </div>
+            <div class="kanban-col">
+                <span class="section-title">In Progress</span>
+                <div id="col-progress" class="kanban-container"></div>
+            </div>
+            <div class="kanban-col">
+                <span class="section-title">Completed</span>
+                <div id="col-completed" class="kanban-container"></div>
+            </div>
+        </div>
+
+        <!-- Telemetry -->
+        <div id="telemetry" class="glass-card fade-in" style="animation-delay: 0.4s;">
+            <span class="section-title" style="margin: 1.5rem 1.5rem 0.5rem 1.5rem;">Activity Telemetry</span>
+            <div id="activity-feed" class="activity-feed"></div>
+        </div>
+    </main>
+
+    <script>
+        const defaultState = {
+            agents: [
+                { id: 'cal', name: 'Health Cal', role: 'Expert Fitness & Cycling', status: 'online', ram: '245MB' },
+                { id: 'llama', name: 'Llama 3', role: 'Reasoning Engine', status: 'busy', ram: '4.2GB' },
+                { id: 'deepseek', name: 'DeepSeek-V3', role: 'Coding Assistant', status: 'offline', ram: '0B' }
+            ],
+            tasks: [
+                { id: 1, title: 'Analyze Strava 100km Ride', agent: 'cal', status: 'completed', ts: '15:20' },
+                { id: 2, title: 'Refactor interaction_store.db', agent: 'deepseek', status: 'pending', ts: '15:45' },
+                { id: 3, title: 'Process morning brief generation', agent: 'cal', status: 'progress', ts: '16:01' }
+            ],
+            telemetry: [
+                { ts: '16:05:22', msg: 'Health Cal initialized heartbeat check.' },
+                { ts: '16:04:10', msg: 'System logs rotated successfully.' },
+                { ts: '15:58:45', msg: 'New model option openrouter/gemini-3-pro added.' }
+            ]
+        };
+
+        let state = JSON.parse(localStorage.getItem('mission_control_state')) || defaultState;
+
+        function saveState() {
+            localStorage.setItem('mission_control_state', JSON.stringify(state));
+        }
+
+        function updateClock() {
+            const now = new Date();
+            document.getElementById('system-clock').textContent = now.toLocaleTimeString();
+        }
+
+        function renderAgents() {
+            const roster = document.getElementById('agent-roster');
+            const select = document.getElementById('agent-select');
+            
+            roster.innerHTML = '';
+            select.innerHTML = '<option value="">Target Agent...</option>';
+
+            state.agents.forEach(agent => {
+                roster.innerHTML += `
+                    <div class="agent-card glass-card fade-in">
+                        <div class="agent-header">
+                            <div>
+                                <div class="agent-name">${agent.name}</div>
+                                <div class="agent-role">${agent.role}</div>
+                            </div>
+                            <div class="status-badge ${agent.status}">
+                                <div class="status-dot"></div>
+                                ${agent.status.toUpperCase()}
+                            </div>
+                        </div>
+                        <div class="resource-metrics">
+                            <div class="metric">RAM: <span>${agent.ram}</span></div>
+                        </div>
+                    </div>
+                `;
+                select.innerHTML += `<option value="${agent.id}">${agent.name}</option>`;
+            });
+        }
+
+        function renderKanban() {
+            const cols = {
+                pending: document.getElementById('col-pending'),
+                progress: document.getElementById('col-progress'),
+                completed: document.getElementById('col-completed')
+            };
+
+            Object.values(cols).forEach(c => c.innerHTML = '');
+
+            state.tasks.forEach(task => {
+                const targetCol = cols[task.status];
+                if (targetCol) {
+                    targetCol.innerHTML += `
+                        <div class="kanban-item glass-card fade-in">
+                            <span class="task-tag">@${task.agent}</span>
+                            <div style="font-weight: 500;">${task.title}</div>
+                            <div style="color: var(--text-secondary); font-size: 0.7rem; margin-top: 5px;">Dispatch: ${task.ts}</div>
+                        </div>
+                    `;
+                }
+            });
+        }
+
+        function renderTelemetry() {
+            const feed = document.getElementById('activity-feed');
+            feed.innerHTML = '';
+            state.telemetry.forEach(log => {
+                feed.innerHTML += `
+                    <div class="activity-item">
+                        <span class="activity-ts">${log.ts}</span>
+                        <div>${log.msg}</div>
+                    </div>
+                `;
+            });
+            feed.scrollTop = 0;
+        }
+
+        function dispatchTask() {
+            const input = document.getElementById('task-input');
+            const agent = document.getElementById('agent-select');
+            
+            if (!input.value || !agent.value) return;
+
+            const now = new Date();
+            const newTask = {
+                id: Date.now(),
+                title: input.value,
+                agent: agent.value,
+                status: 'pending',
+                ts: now.getHours() + ':' + String(now.getMinutes()).padStart(2, '0')
+            };
+
+            state.tasks.unshift(newTask);
+            state.telemetry.unshift({
+                ts: now.toLocaleTimeString(),
+                msg: `Dispatched: "${newTask.title}" to ${newTask.agent}`
+            });
+
+            input.value = '';
+            saveState();
+            renderKanban();
+            renderTelemetry();
+        }
+
+        // Initialize
+        updateClock();
+        setInterval(updateClock, 1000);
+        renderAgents();
+        renderKanban();
+        renderTelemetry();
+
+    </script>
+</body>
+</html>
