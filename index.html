@@ -306,12 +306,59 @@
                 <p class="welcome-sub" id="live-date">Tuesday, March 3rd, 2026</p>
             </div>
 
-            <div class="metrics-grid">
-                <div class="metric-card glass fade-in">
+            <div class="metrics-grid" style="grid-template-columns: 2fr 1fr 1fr;">
+                <!-- OpenClaw LLM Metrics Box -->
+                <div class="glass fade-in" style="padding: 1.5rem; position: relative; overflow: hidden; grid-row: span 1;">
                     <div class="metric-accent"></div>
-                    <div class="metric-label">OpenClaw Gateway</div>
-                    <div class="metric-value" id="m-gateway-status">Active</div>
-                    <div class="metric-trend trend-up" id="m-gateway-latency">12ms latency</div>
+                    <div class="card-header" style="margin-bottom: 1.25rem;">
+                        <h2 class="card-title" style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; color: var(--text-secondary);">OpenClaw LLM Metrics</h2>
+                    </div>
+                    
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 1.25rem;">
+                        <div>
+                            <div style="font-size: 0.65rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 1px;">Daily Tokens</div>
+                            <div style="font-size: 1.75rem; font-weight: 700; margin: 0.15rem 0; color: var(--text-primary);">145,200</div>
+                            <div style="font-size: 0.65rem; color: var(--text-secondary); opacity: 0.8;">Weekly Consumption (840,500)</div>
+                        </div>
+                        <div>
+                            <div style="font-size: 0.65rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 1px;">Total Cost</div>
+                            <div style="font-size: 1.75rem; font-weight: 700; margin: 0.15rem 0; color: var(--text-primary);">$12.84</div>
+                            <div style="font-size: 0.65rem; color: var(--warning); font-weight: 500;">42% of 2M Alert</div>
+                        </div>
+                    </div>
+
+                    <div style="height: 1px; background: var(--border-subtle); margin-bottom: 1.25rem;"></div>
+
+                    <div style="display: grid; grid-template-columns: 1.5fr 1fr; gap: 1rem;">
+                        <div>
+                            <span style="font-size: 0.65rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 1px; display: block; margin-bottom: 0.75rem;">Model Breakdown</span>
+                            <div style="display: flex; flex-direction: column; gap: 0.6rem;">
+                                <div style="display: grid; grid-template-columns: 1fr auto auto; gap: 1rem; font-size: 0.8rem;">
+                                    <span style="color: var(--text-primary);">google/gemini-3-flash...</span>
+                                    <span style="color: var(--text-secondary);">680,000</span>
+                                    <span style="color: var(--accent); font-weight: 600;">$10.20</span>
+                                </div>
+                                <div style="display: grid; grid-template-columns: 1fr auto auto; gap: 1rem; font-size: 0.8rem;">
+                                    <span style="color: var(--text-primary);">ollama/mistral-nemo</span>
+                                    <span style="color: var(--text-secondary);">120,500</span>
+                                    <span style="color: var(--success); font-weight: 600;">Free</span>
+                                </div>
+                                <div style="display: grid; grid-template-columns: 1fr auto auto; gap: 1rem; font-size: 0.8rem;">
+                                    <span style="color: var(--text-primary);">claude-3-5-sonnet</span>
+                                    <span style="color: var(--text-secondary);">40,000</span>
+                                    <span style="color: var(--accent); font-weight: 600;">$2.64</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div style="text-align: right;">
+                            <span style="font-size: 0.65rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 1px; display: block; margin-bottom: 0.75rem;">Agent Breakdown</span>
+                            <div style="font-size: 0.75rem; color: var(--text-secondary);">
+                                <div style="margin-bottom: 4px;">Cal: <span style="color: var(--text-primary);">75%</span></div>
+                                <div style="margin-bottom: 4px;">Vicky: <span style="color: var(--text-primary);">20%</span></div>
+                                <div>System: <span style="color: var(--text-primary);">5%</span></div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 <div class="metric-card glass fade-in" style="animation-delay: 0.1s;">
                     <div class="metric-accent" style="background: #a855f7;"></div>
