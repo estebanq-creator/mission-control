@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OpenClaw Mission Control</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <title>Mission Control | Esteban Quinones</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
             --bg-primary: #050508;
@@ -14,15 +14,14 @@
             --border-subtle: rgba(255, 255, 255, 0.06);
             --text-primary: #ffffff;
             --text-secondary: #a1a1aa;
-            --nav-bg: rgba(5, 5, 8, 0.7);
+            --nav-bg: rgba(5, 5, 8, 0.8);
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
             --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
             background-color: var(--bg-primary);
@@ -45,26 +44,24 @@
             100% { box-shadow: 0 0 0 0 rgba(0, 210, 255, 0); }
         }
 
-        .fade-in {
-            animation: fadeInUp 0.6s ease-out forwards;
-        }
+        .fade-in { animation: fadeInUp 0.6s ease-out forwards; }
 
-        /* Glassmorphism Utility */
-        .glass-card {
+        /* Glassmorphism */
+        .glass {
             background: var(--card-bg);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
             border: 1px solid var(--border-subtle);
-            border-radius: 12px;
+            border-radius: 16px;
             transition: var(--transition);
         }
 
-        .glass-card:hover {
-            border-color: var(--accent);
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+        .glass:hover {
+            border-color: rgba(255, 255, 255, 0.12);
+            background: rgba(255, 255, 255, 0.05);
         }
 
-        /* Layout */
+        /* Header */
         header {
             position: sticky;
             top: 0;
@@ -72,426 +69,572 @@
             background: var(--nav-bg);
             backdrop-filter: blur(12px);
             border-bottom: 1px solid var(--border-subtle);
-            padding: 1rem 2rem;
+            padding: 0.75rem 2rem;
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
 
-        .logo {
-            font-weight: 600;
-            font-size: 1.25rem;
-            letter-spacing: -0.5px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .status-indicator {
-            width: 10px;
-            height: 10px;
-            background: var(--accent);
-            border-radius: 50%;
-            display: inline-block;
-            animation: pulse 2s infinite;
-        }
-
-        .search-bar input {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid var(--border-subtle);
+        .logo-group { display: flex; align-items: center; gap: 12px; }
+        .logo-text { font-weight: 700; font-size: 1.1rem; letter-spacing: -0.5px; }
+        
+        nav { display: flex; gap: 8px; }
+        .nav-link {
             padding: 0.5rem 1rem;
             border-radius: 8px;
-            color: white;
-            width: 300px;
-            outline: none;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
             transition: var(--transition);
+            cursor: pointer;
+        }
+        .nav-link:hover { color: var(--text-primary); background: rgba(255,255,255,0.05); }
+        .nav-link.active { color: var(--accent); background: rgba(0, 210, 255, 0.1); }
+
+        .header-right { display: flex; align-items: center; gap: 20px; }
+        .search-container { position: relative; }
+        .search-input {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-subtle);
+            padding: 0.5rem 1rem 0.5rem 2.5rem;
+            border-radius: 8px;
+            color: white;
+            width: 240px;
+            outline: none;
+            font-size: 0.85rem;
+        }
+        .search-input:focus { border-color: var(--accent); }
+        .kbd-hint {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+            background: rgba(255,255,255,0.1);
+            padding: 2px 4px;
+            border-radius: 4px;
         }
 
-        .search-bar input:focus {
-            border-color: var(--accent);
-        }
-
+        /* Main Content */
         main {
-            padding: 2rem;
             max-width: 1600px;
             margin: 0 auto;
+            padding: 2.5rem;
+        }
+
+        .tab-content { display: none; }
+        .tab-content.active { display: block; animation: fadeInUp 0.4s ease-out; }
+
+        /* Dashboard Specific */
+        .welcome-bar { margin-bottom: 2.5rem; }
+        .welcome-title { font-size: 2rem; font-weight: 700; margin-bottom: 0.5rem; }
+        .welcome-sub { color: var(--text-secondary); font-size: 1rem; }
+
+        .metrics-grid {
             display: grid;
-            grid-template-columns: repeat(12, 1fr);
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 2.5rem;
+        }
+
+        .metric-card {
+            padding: 1.5rem;
+            position: relative;
+            overflow: hidden;
+        }
+        .metric-accent {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 3px;
+            background: var(--accent);
+        }
+        .metric-label { font-size: 0.8rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 1px; }
+        .metric-value { font-size: 1.75rem; font-weight: 700; margin: 0.5rem 0; }
+        .metric-trend { font-size: 0.8rem; display: flex; align-items: center; gap: 4px; }
+        .trend-up { color: var(--success); }
+        .trend-down { color: var(--danger); }
+
+        .dashboard-layout {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
             gap: 1.5rem;
         }
 
-        .section-title {
-            font-size: 0.75rem;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            color: var(--text-secondary);
-            margin-bottom: 1rem;
-            display: block;
-        }
-
-        /* Agent Roster */
-        #agent-roster {
-            grid-column: span 12;
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 1rem;
-        }
-
-        .agent-card {
-            padding: 1.5rem;
-        }
-
-        .agent-header {
+        /* Priorities & Feed */
+        .card-header {
             display: flex;
             justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 1rem;
+            align-items: center;
+            margin-bottom: 1.5rem;
         }
+        .card-title { font-size: 1.1rem; font-weight: 600; }
 
-        .agent-name {
-            font-weight: 600;
-            font-size: 1.1rem;
-        }
-
-        .agent-role {
-            font-size: 0.8rem;
-            color: var(--text-secondary);
-        }
-
-        .status-badge {
-            font-size: 0.7rem;
-            padding: 2px 8px;
-            border-radius: 4px;
+        .priority-list { list-style: none; }
+        .priority-item {
             display: flex;
             align-items: center;
-            gap: 5px;
+            gap: 12px;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid var(--border-subtle);
         }
-
-        .status-dot {
-            width: 6px;
-            height: 6px;
-            border-radius: 50%;
-        }
-
-        .online .status-dot { background: #10b981; }
-        .busy .status-dot { background: #f59e0b; }
-        .offline .status-dot { background: #6b7280; }
-
-        .resource-metrics {
-            margin-top: 1rem;
-            font-size: 0.8rem;
-            display: flex;
-            gap: 15px;
-        }
-
-        .metric {
-            color: var(--text-secondary);
-        }
-
-        .metric span {
-            color: var(--text-primary);
-            font-weight: 500;
-        }
-
-        /* Dispatcher */
-        #dispatcher {
-            grid-column: span 12;
-            padding: 1.5rem;
-        }
-
-        .dispatch-controls {
-            display: flex;
-            gap: 1rem;
-        }
-
-        .dispatch-input {
-            flex-grow: 1;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid var(--border-subtle);
-            padding: 1rem;
-            border-radius: 8px;
-            color: white;
-            font-family: inherit;
-            outline: none;
-        }
-
-        .dispatch-select {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid var(--border-subtle);
-            color: white;
-            padding: 0.5rem 1rem;
-            border-radius: 8px;
-            outline: none;
-        }
-
-        .dispatch-btn {
-            background: var(--accent);
-            color: var(--bg-primary);
-            border: none;
-            padding: 0 2rem;
-            border-radius: 8px;
-            font-weight: 600;
+        .priority-item:last-child { border: none; }
+        input[type="checkbox"] {
+            appearance: none;
+            width: 18px; height: 18px;
+            border: 2px solid var(--border-subtle);
+            border-radius: 4px;
             cursor: pointer;
             transition: var(--transition);
         }
-
-        .dispatch-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px var(--accent-glow);
+        input[type="checkbox"]:checked {
+            background: var(--accent);
+            border-color: var(--accent);
         }
 
-        /* Kanban Board */
-        #mission-control {
-            grid-column: span 8;
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 1rem;
+        .feed-container { max-height: 400px; overflow-y: auto; padding-right: 10px; }
+        .feed-item {
+            padding-bottom: 1rem;
+            margin-bottom: 1rem;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+        .feed-ts { font-size: 0.7rem; color: var(--text-secondary); }
+        .feed-msg { font-size: 0.85rem; margin-top: 2px; }
+
+        /* Kanban */
+        .kanban-board {
+            display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem;
+        }
+        .kanban-col { background: rgba(255,255,255,0.01); border-radius: 12px; padding: 1rem; min-height: 600px; }
+        .col-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; padding: 0 0.5rem; }
+        .task-card { padding: 1rem; margin-bottom: 1rem; cursor: pointer; position: relative; }
+        .priority-badge { font-size: 0.65rem; padding: 2px 6px; border-radius: 4px; text-transform: uppercase; font-weight: 700; margin-bottom: 8px; display: inline-block; }
+        .p-high { background: rgba(239, 68, 68, 0.15); color: var(--danger); }
+        .p-medium { background: rgba(245, 158, 11, 0.15); color: var(--warning); }
+        .p-low { background: rgba(16, 185, 129, 0.15); color: var(--success); }
+
+        /* Timeline */
+        .timeline-container { position: relative; padding-left: 2rem; }
+        .timeline-line { position: absolute; left: 7px; top: 0; bottom: 0; width: 2px; background: var(--border-subtle); }
+        .timeline-phase { position: relative; margin-bottom: 3rem; }
+        .phase-dot {
+            position: absolute; left: -2rem; top: 5px; width: 16px; height: 16px;
+            background: var(--bg-primary); border: 2px solid var(--border-subtle); border-radius: 50%; z-index: 2;
+        }
+        .active-phase .phase-dot { border-color: var(--accent); box-shadow: 0 0 10px var(--accent-glow); background: var(--accent); }
+        .active-phase.glass { border-color: var(--accent); box-shadow: 0 0 30px rgba(0, 210, 255, 0.05); }
+        .phase-content { padding: 1.5rem; }
+        .milestone-list { list-style: none; margin-top: 1rem; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .milestone-item { font-size: 0.85rem; display: flex; align-items: center; gap: 8px; color: var(--text-secondary); }
+
+        /* Notes */
+        .notes-area {
+            width: 100%; min-height: 70vh; background: transparent; border: none; outline: none;
+            color: var(--text-primary); font-family: 'Inter', sans-serif; font-size: 1.1rem; resize: none;
+            padding: 1rem; line-height: 1.8;
         }
 
-        .kanban-col {
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
-        }
-
-        .kanban-item {
-            padding: 1rem;
+        /* UI Elements */
+        .btn {
+            background: var(--accent); color: var(--bg-primary); border: none; padding: 0.6rem 1.2rem;
+            border-radius: 8px; font-weight: 600; cursor: pointer; transition: var(--transition);
             font-size: 0.85rem;
         }
+        .btn:hover { transform: translateY(-2px); box-shadow: 0 4px 12px var(--accent-glow); }
+        .btn-ghost { background: transparent; color: var(--text-secondary); border: 1px solid var(--border-subtle); }
+        .btn-ghost:hover { color: white; border-color: white; }
 
-        .task-tag {
-            font-size: 0.7rem;
-            color: var(--accent);
-            margin-bottom: 0.5rem;
-            display: block;
+        /* Modal */
+        .modal {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(8px);
+            display: none; justify-content: center; align-items: center; z-index: 2000;
         }
-
-        /* Telemetry Feed */
-        #telemetry {
-            grid-column: span 4;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .activity-feed {
-            flex-grow: 1;
-            max-height: 500px;
-            overflow-y: auto;
-            padding: 1rem;
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
-        }
-
-        .activity-item {
-            padding-bottom: 0.8rem;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-            font-size: 0.8rem;
-        }
-
-        .activity-ts {
-            color: var(--text-secondary);
-            font-size: 0.7rem;
-            display: block;
-            margin-bottom: 2px;
+        .modal-content { width: 500px; padding: 2rem; }
+        .form-group { margin-bottom: 1rem; }
+        .form-label { display: block; font-size: 0.8rem; margin-bottom: 0.5rem; color: var(--text-secondary); }
+        .form-input {
+            width: 100%; background: rgba(255,255,255,0.05); border: 1px solid var(--border-subtle);
+            padding: 0.75rem; border-radius: 8px; color: white; outline: none;
         }
 
         /* Scrollbar */
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: var(--border-subtle); border-radius: 10px; }
-        ::-webkit-scrollbar-thumb:hover { background: var(--text-secondary); }
 
-        @media (max-width: 1024px) {
-            #mission-control { grid-column: span 12; }
-            #telemetry { grid-column: span 12; }
+        @media (max-width: 1200px) {
+            .metrics-grid { grid-template-columns: 1fr 1fr; }
+            .dashboard-layout { grid-template-columns: 1fr; }
         }
     </style>
 </head>
 <body>
 
     <header>
-        <div class="logo">
-            <span class="status-indicator"></span>
-            MISSION CONTROL
+        <div class="logo-group">
+            <div style="width: 10px; height: 10px; background: var(--accent); border-radius: 50%; animation: pulse 2s infinite;"></div>
+            <span class="logo-text">MISSION CONTROL</span>
         </div>
-        <div class="search-bar">
-            <input type="text" placeholder="Search tasks, agents, or files...">
+        <nav>
+            <div class="nav-link active" onclick="showTab('dashboard')">📊 Dashboard</div>
+            <div class="nav-link" onclick="showTab('projects')">📋 Projects</div>
+            <div class="nav-link" onclick="showTab('timeline')">📅 Timeline</div>
+            <div class="nav-link" onclick="showTab('notes')">📝 Notes</div>
+        </nav>
+        <div class="header-right">
+            <div class="search-container">
+                <input type="text" id="global-search" class="search-input" placeholder="Search Command Center...">
+                <span class="kbd-hint">⌘K</span>
+            </div>
+            <span id="header-clock" style="font-size: 0.85rem; font-weight: 500; font-variant-numeric: tabular-nums;"></span>
         </div>
-        <div id="system-clock" style="font-variant-numeric: tabular-nums; font-size: 0.9rem; color: var(--text-secondary);"></div>
     </header>
 
     <main>
-        <!-- Agent Roster -->
-        <div style="grid-column: span 12;">
-            <span class="section-title">Agent Roster Grid</span>
-            <div id="agent-roster"></div>
-        </div>
+        <!-- Dashboard Tab -->
+        <section id="dashboard" class="tab-content active">
+            <div class="welcome-bar">
+                <h1 class="welcome-title" id="greeting">Good afternoon, Esteban</h1>
+                <p class="welcome-sub" id="live-date">Tuesday, March 3rd, 2026</p>
+            </div>
 
-        <!-- Dispatcher -->
-        <div id="dispatcher" class="glass-card fade-in">
-            <span class="section-title">Request Dispatcher</span>
-            <div class="dispatch-controls">
-                <input type="text" id="task-input" class="dispatch-input" placeholder="Enter command or task request...">
-                <select id="agent-select" class="dispatch-select">
-                    <!-- Populated by JS -->
-                </select>
-                <button class="dispatch-btn" onclick="dispatchTask()">Dispatch Task</button>
+            <div class="metrics-grid">
+                <div class="metric-card glass fade-in">
+                    <div class="metric-accent"></div>
+                    <div class="metric-label">Goal Progress</div>
+                    <div class="metric-value" id="m-goal-progress">42%</div>
+                    <div class="metric-trend trend-up">↑ 4.2% this month</div>
+                </div>
+                <div class="metric-card glass fade-in" style="animation-delay: 0.1s;">
+                    <div class="metric-accent" style="background: #a855f7;"></div>
+                    <div class="metric-label">Active Projects</div>
+                    <div class="metric-value" id="m-active-projects">8</div>
+                    <div class="metric-trend">Stable</div>
+                </div>
+                <div class="metric-card glass fade-in" style="animation-delay: 0.2s;">
+                    <div class="metric-accent" style="background: #10b981;"></div>
+                    <div class="metric-label">Tasks Today</div>
+                    <div class="metric-value" id="m-tasks-today">12</div>
+                    <div class="metric-trend trend-up">↑ 2 from yesterday</div>
+                </div>
+                <div class="metric-card glass fade-in" style="animation-delay: 0.3s;">
+                    <div class="metric-accent" style="background: #ef4444;"></div>
+                    <div class="metric-label">Days to Build Goal</div>
+                    <div class="metric-value" id="m-countdown">1,018</div>
+                    <div class="metric-trend">Target: 12/15/2028</div>
+                </div>
             </div>
-        </div>
 
-        <!-- Kanban Board -->
-        <div id="mission-control" class="fade-in" style="animation-delay: 0.2s;">
-            <div class="kanban-col">
-                <span class="section-title">Pending Assignment</span>
-                <div id="col-pending" class="kanban-container"></div>
+            <div class="dashboard-layout">
+                <div class="glass" style="padding: 2rem;">
+                    <div class="card-header">
+                        <h2 class="card-title">Top Priorities</h2>
+                        <button class="btn" onclick="openModal('priority')">+ New Priority</button>
+                    </div>
+                    <ul id="priority-list" class="priority-list">
+                        <!-- Items injected by JS -->
+                    </ul>
+                </div>
+                <div class="glass" style="padding: 2rem;">
+                    <div class="card-header">
+                        <h2 class="card-title">Recent Activity</h2>
+                    </div>
+                    <div id="activity-feed" class="feed-container">
+                        <!-- Items injected by JS -->
+                    </div>
+                </div>
             </div>
-            <div class="kanban-col">
-                <span class="section-title">In Progress</span>
-                <div id="col-progress" class="kanban-container"></div>
-            </div>
-            <div class="kanban-col">
-                <span class="section-title">Completed</span>
-                <div id="col-completed" class="kanban-container"></div>
-            </div>
-        </div>
+        </section>
 
-        <!-- Telemetry -->
-        <div id="telemetry" class="glass-card fade-in" style="animation-delay: 0.4s;">
-            <span class="section-title" style="margin: 1.5rem 1.5rem 0.5rem 1.5rem;">Activity Telemetry</span>
-            <div id="activity-feed" class="activity-feed"></div>
-        </div>
+        <!-- Projects Tab -->
+        <section id="projects" class="tab-content">
+            <div class="kanban-board">
+                <div class="kanban-col">
+                    <div class="col-header">
+                        <span class="section-title">Backlog</span>
+                        <button class="btn-ghost" style="padding: 2px 8px;" onclick="openModal('task', 'backlog')">+</button>
+                    </div>
+                    <div id="col-backlog"></div>
+                </div>
+                <div class="kanban-col">
+                    <div class="col-header">
+                        <span class="section-title">In Progress</span>
+                        <button class="btn-ghost" style="padding: 2px 8px;" onclick="openModal('task', 'progress')">+</button>
+                    </div>
+                    <div id="col-progress"></div>
+                </div>
+                <div class="kanban-col">
+                    <div class="col-header">
+                        <span class="section-title">Done</span>
+                        <button class="btn-ghost" style="padding: 2px 8px;" onclick="openModal('task', 'done')">+</button>
+                    </div>
+                    <div id="col-done"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Timeline Tab -->
+        <section id="timeline" class="tab-content">
+            <div class="timeline-container">
+                <div class="timeline-line"></div>
+                <div id="timeline-phases">
+                    <!-- Phases injected by JS -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Notes Tab -->
+        <section id="notes" class="tab-content">
+            <div class="glass" style="padding: 1rem;">
+                <textarea id="notes-input" class="notes-area" placeholder="Start typing your ideas here... Auto-saves on every stroke."></textarea>
+            </div>
+        </section>
     </main>
 
+    <!-- Modals -->
+    <div id="modal-priority" class="modal">
+        <div class="modal-content glass">
+            <h2 style="margin-bottom: 1.5rem;">Add Priority</h2>
+            <div class="form-group">
+                <label class="form-label">Task Name</label>
+                <input type="text" id="p-input-name" class="form-input" placeholder="What needs doing?">
+            </div>
+            <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 2rem;">
+                <button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
+                <button class="btn" onclick="savePriority()">Save Priority</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal-task" class="modal">
+        <div class="modal-content glass">
+            <h2 id="task-modal-title" style="margin-bottom: 1.5rem;">Add Task</h2>
+            <input type="hidden" id="task-input-status">
+            <div class="form-group">
+                <label class="form-label">Title</label>
+                <input type="text" id="t-input-title" class="form-input">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Priority</label>
+                <select id="t-input-priority" class="form-input">
+                    <option value="high">High</option>
+                    <option value="medium" selected>Medium</option>
+                    <option value="low">Low</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Description</label>
+                <textarea id="t-input-desc" class="form-input" style="height: 100px;"></textarea>
+            </div>
+            <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 2rem;">
+                <button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
+                <button class="btn" onclick="saveTask()">Save Task</button>
+            </div>
+        </div>
+    </div>
+
     <script>
-        const defaultState = {
-            agents: [
-                { id: 'cal', name: 'Health Cal', role: 'Expert Fitness & Cycling', status: 'online', ram: '245MB' },
-                { id: 'llama', name: 'Llama 3', role: 'Reasoning Engine', status: 'busy', ram: '4.2GB' },
-                { id: 'deepseek', name: 'DeepSeek-V3', role: 'Coding Assistant', status: 'offline', ram: '0B' }
+        // Data Architecture
+        const defaultData = {
+            priorities: [
+                { id: 1, text: 'Finalize OpenClaw deployment architecture', completed: true },
+                { id: 2, text: 'Review land acquisition milestones for 2026', completed: false },
+                { id: 3, text: 'Optimize Gemini fallback logic', completed: false }
             ],
             tasks: [
-                { id: 1, title: 'Analyze Strava 100km Ride', agent: 'cal', status: 'completed', ts: '15:20' },
-                { id: 2, title: 'Refactor interaction_store.db', agent: 'deepseek', status: 'pending', ts: '15:45' },
-                { id: 3, title: 'Process morning brief generation', agent: 'cal', status: 'progress', ts: '16:01' }
+                { id: 1, title: 'Land Survey', desc: 'Complete topographic survey of the north lot.', priority: 'high', status: 'done', date: '2026-03-01' },
+                { id: 2, title: 'Architect Meeting', desc: 'Initial concept review for main structure.', priority: 'medium', status: 'progress', date: '2026-03-02' },
+                { id: 3, title: 'Fund Allocation', desc: 'Review budget for Q3 materials.', priority: 'low', status: 'backlog', date: '2026-03-03' }
             ],
-            telemetry: [
-                { ts: '16:05:22', msg: 'Health Cal initialized heartbeat check.' },
-                { ts: '16:04:10', msg: 'System logs rotated successfully.' },
-                { ts: '15:58:45', msg: 'New model option openrouter/gemini-3-pro added.' }
-            ]
+            timeline: [
+                { id: 1, title: 'Phase 1: Foundation & Planning', range: 'Jan 2026 - Dec 2026', active: true, milestones: [
+                    { text: 'Land Survey', done: true },
+                    { text: 'Architectural Approval', done: false },
+                    { text: 'Permit Acquisition', done: false }
+                ]},
+                { id: 2, title: 'Phase 2: Structural Shell', range: 'Jan 2027 - Aug 2027', active: false, milestones: [
+                    { text: 'Framing', done: false },
+                    { text: 'Roofing', done: false }
+                ]}
+            ],
+            activity: [
+                { ts: '16:04', msg: 'Updated Mission Control UI to v2.0' },
+                { ts: '15:52', msg: 'Added openrouter/gemini-3-pro model' }
+            ],
+            notes: "# Mission Control Notes\n\nDaily Focus:\n- Build the network.\n- Build the house."
         };
 
-        let state = JSON.parse(localStorage.getItem('mission_control_state')) || defaultState;
+        let state = JSON.parse(localStorage.getItem('esteban_mission_control')) || defaultData;
 
         function saveState() {
-            localStorage.setItem('mission_control_state', JSON.stringify(state));
+            localStorage.setItem('esteban_mission_control', JSON.stringify(state));
+        }
+
+        // UI Logic
+        function showTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+            
+            document.getElementById(tabId).classList.add('active');
+            document.querySelector(`[onclick="showTab('${tabId}')"]`).classList.add('active');
+            
+            if (tabId === 'projects') renderKanban();
+            if (tabId === 'timeline') renderTimeline();
         }
 
         function updateClock() {
             const now = new Date();
-            document.getElementById('system-clock').textContent = now.toLocaleTimeString();
+            const h = now.getHours();
+            
+            // Header Clock
+            document.getElementById('header-clock').textContent = now.toLocaleTimeString('en-US', { hour12: false });
+            
+            // Dashboard Greeting
+            const greet = h < 12 ? 'morning' : h < 18 ? 'afternoon' : 'evening';
+            document.getElementById('greeting').textContent = `Good ${greet}, Esteban`;
+            document.getElementById('live-date').textContent = now.toLocaleDateString('en-US', { 
+                weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' 
+            });
+
+            // Countdown to 12/15/2028
+            const target = new Date('2028-12-15');
+            const diff = target - now;
+            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+            document.getElementById('m-countdown').textContent = days.toLocaleString();
         }
 
-        function renderAgents() {
-            const roster = document.getElementById('agent-roster');
-            const select = document.getElementById('agent-select');
-            
-            roster.innerHTML = '';
-            select.innerHTML = '<option value="">Target Agent...</option>';
+        // Render Functions
+        function renderDashboard() {
+            // Priorities
+            const pList = document.getElementById('priority-list');
+            pList.innerHTML = '';
+            state.priorities.forEach(p => {
+                pList.innerHTML += `
+                    <li class="priority-item">
+                        <input type="checkbox" ${p.completed ? 'checked' : ''} onchange="togglePriority(${p.id})">
+                        <span style="${p.completed ? 'text-decoration: line-through; color: var(--text-secondary);' : ''}">${p.text}</span>
+                    </li>
+                `;
+            });
 
-            state.agents.forEach(agent => {
-                roster.innerHTML += `
-                    <div class="agent-card glass-card fade-in">
-                        <div class="agent-header">
-                            <div>
-                                <div class="agent-name">${agent.name}</div>
-                                <div class="agent-role">${agent.role}</div>
-                            </div>
-                            <div class="status-badge ${agent.status}">
-                                <div class="status-dot"></div>
-                                ${agent.status.toUpperCase()}
-                            </div>
-                        </div>
-                        <div class="resource-metrics">
-                            <div class="metric">RAM: <span>${agent.ram}</span></div>
-                        </div>
+            // Activity
+            const feed = document.getElementById('activity-feed');
+            feed.innerHTML = '';
+            state.activity.forEach(a => {
+                feed.innerHTML += `
+                    <div class="feed-item">
+                        <div class="feed-ts">${a.ts}</div>
+                        <div class="feed-msg">${a.msg}</div>
                     </div>
                 `;
-                select.innerHTML += `<option value="${agent.id}">${agent.name}</option>`;
             });
+
+            // Metrics
+            document.getElementById('m-active-projects').textContent = state.tasks.filter(t => t.status !== 'done').length;
+            document.getElementById('m-tasks-today').textContent = state.priorities.filter(p => !p.completed).length;
         }
 
         function renderKanban() {
-            const cols = {
-                pending: document.getElementById('col-pending'),
-                progress: document.getElementById('col-progress'),
-                completed: document.getElementById('col-completed')
-            };
-
-            Object.values(cols).forEach(c => c.innerHTML = '');
-
-            state.tasks.forEach(task => {
-                const targetCol = cols[task.status];
-                if (targetCol) {
-                    targetCol.innerHTML += `
-                        <div class="kanban-item glass-card fade-in">
-                            <span class="task-tag">@${task.agent}</span>
-                            <div style="font-weight: 500;">${task.title}</div>
-                            <div style="color: var(--text-secondary); font-size: 0.7rem; margin-top: 5px;">Dispatch: ${task.ts}</div>
+            ['backlog', 'progress', 'done'].forEach(status => {
+                const container = document.getElementById(`col-${status}`);
+                container.innerHTML = '';
+                state.tasks.filter(t => t.status === status).forEach(task => {
+                    container.innerHTML += `
+                        <div class="task-card glass fade-in" onclick="editTask(${task.id})">
+                            <span class="priority-badge p-${task.priority}">${task.priority}</span>
+                            <div style="font-weight: 600; margin-bottom: 4px;">${task.title}</div>
+                            <div style="font-size: 0.8rem; color: var(--text-secondary);">${task.desc}</div>
                         </div>
                     `;
-                }
+                });
             });
         }
 
-        function renderTelemetry() {
-            const feed = document.getElementById('activity-feed');
-            feed.innerHTML = '';
-            state.telemetry.forEach(log => {
-                feed.innerHTML += `
-                    <div class="activity-item">
-                        <span class="activity-ts">${log.ts}</span>
-                        <div>${log.msg}</div>
+        function renderTimeline() {
+            const container = document.getElementById('timeline-phases');
+            container.innerHTML = '';
+            state.timeline.forEach(phase => {
+                container.innerHTML += `
+                    <div class="timeline-phase glass phase-content ${phase.active ? 'active-phase' : ''}">
+                        <div class="phase-dot"></div>
+                        <div style="display: flex; justify-content: space-between;">
+                            <h3 style="font-weight: 700;">${phase.title}</h3>
+                            <span style="font-size: 0.8rem; color: var(--accent);">${phase.range}</span>
+                        </div>
+                        <ul class="milestone-list">
+                            ${phase.milestones.map(m => `
+                                <li class="milestone-item">
+                                    <span style="color: ${m.done ? 'var(--success)' : 'var(--text-secondary)'}">${m.done ? '●' : '○'}</span>
+                                    ${m.text}
+                                </li>
+                            `).join('')}
+                        </ul>
                     </div>
                 `;
             });
-            feed.scrollTop = 0;
         }
 
-        function dispatchTask() {
-            const input = document.getElementById('task-input');
-            const agent = document.getElementById('agent-select');
-            
-            if (!input.value || !agent.value) return;
+        // Actions
+        function togglePriority(id) {
+            const p = state.priorities.find(x => x.id === id);
+            p.completed = !p.completed;
+            saveState();
+            renderDashboard();
+        }
 
-            const now = new Date();
-            const newTask = {
-                id: Date.now(),
-                title: input.value,
-                agent: agent.value,
-                status: 'pending',
-                ts: now.getHours() + ':' + String(now.getMinutes()).padStart(2, '0')
-            };
+        function openModal(type, status = '') {
+            document.getElementById(`modal-${type}`).style.display = 'flex';
+            if (type === 'task') document.getElementById('task-input-status').value = status;
+        }
 
-            state.tasks.unshift(newTask);
-            state.telemetry.unshift({
-                ts: now.toLocaleTimeString(),
-                msg: `Dispatched: "${newTask.title}" to ${newTask.agent}`
-            });
+        function closeModal() {
+            document.querySelectorAll('.modal').forEach(m => m.style.display = 'none');
+        }
 
+        function savePriority() {
+            const input = document.getElementById('p-input-name');
+            if (!input.value) return;
+            state.priorities.unshift({ id: Date.now(), text: input.value, completed: false });
+            saveState();
+            renderDashboard();
+            closeModal();
             input.value = '';
+        }
+
+        function saveTask() {
+            const title = document.getElementById('t-input-title').value;
+            const priority = document.getElementById('t-input-priority').value;
+            const desc = document.getElementById('t-input-desc').value;
+            const status = document.getElementById('task-input-status').value;
+
+            state.tasks.push({
+                id: Date.now(), title, desc, priority, status, date: new Date().toISOString().split('T')[0]
+            });
             saveState();
             renderKanban();
-            renderTelemetry();
+            closeModal();
         }
+
+        // Keyboard Shortcuts
+        window.addEventListener('keydown', (e) => {
+            if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+                e.preventDefault();
+                document.getElementById('global-search').focus();
+            }
+        });
 
         // Initialize
         updateClock();
         setInterval(updateClock, 1000);
-        renderAgents();
-        renderKanban();
-        renderTelemetry();
+        renderDashboard();
+        
+        // Notes Auto-save
+        const notesInput = document.getElementById('notes-input');
+        notesInput.value = state.notes;
+        notesInput.addEventListener('input', (e) => {
+            state.notes = e.target.value;
+            saveState();
+        });
 
     </script>
 </body>
