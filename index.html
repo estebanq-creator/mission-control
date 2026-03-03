@@ -287,7 +287,6 @@
             <div class="nav-link active" onclick="showTab('dashboard')">📊 Dashboard</div>
             <div class="nav-link" onclick="showTab('agents')">🏢 Command Center</div>
             <div class="nav-link" onclick="showTab('projects')">📋 Projects</div>
-            <div class="nav-link" onclick="showTab('team')">👥 Team</div>
             <div class="nav-link" onclick="showTab('notes')">📝 Notes</div>
         </nav>
         <div class="header-right">
@@ -412,17 +411,6 @@
             </div>
         </section>
 
-        <!-- Team Tab -->
-        <section id="team" class="tab-content">
-            <div class="mission-card glass fade-in" style="padding: 2.5rem; text-align: center;">
-                <div class="mission-glow"></div>
-                <span class="section-title">North Star Mission Statement</span>
-                <h1 style="font-size: 1.75rem; font-weight: 700; margin-top: 1rem;">"Empower Human Potential through an Autonomous, High-Performance Agent Network."</h1>
-            </div>
-            <div class="org-root fade-in"><div class="glass org-node"><h2>OpenClaw Root</h2><div class="agent-id-tag">Claude 3.5 Sonnet</div></div></div>
-            <div class="team-grid" id="team-grid"></div>
-        </section>
-
         <!-- Notes Tab -->
         <section id="notes" class="tab-content">
             <div class="glass" style="padding: 1rem;"><textarea id="notes-input" class="notes-area"></textarea></div>
@@ -502,7 +490,6 @@
             if (tabId === 'dashboard') renderDashboard();
             if (tabId === 'projects') renderKanban();
             if (tabId === 'agents') { renderAgentGrid(); renderCronGrid(); renderProactivityLog(); }
-            if (tabId === 'team') renderTeam();
         }
 
         function renderCronGrid() {
@@ -583,7 +570,6 @@
             });
         }
         function renderDecisions() { /* Logic from previous version */ }
-        function renderTeam() { /* Logic from previous version */ }
 
         function openAgentPanel(id) {
             const agent = state.agents.find(a => a.id === id);
