@@ -134,7 +134,7 @@
 
         .metrics-grid {
             display: grid;
-            grid-template-columns: repeat(4, 1fr);
+            grid-template-columns: repeat(3, 1fr);
             gap: 1.5rem;
             margin-bottom: 2.5rem;
         }
@@ -157,7 +157,7 @@
 
         .dashboard-layout {
             display: grid;
-            grid-template-columns: 2fr 1fr;
+            grid-template-columns: 1fr;
             gap: 1.5rem;
         }
 
@@ -325,31 +325,9 @@
                     <div class="metric-value" id="m-active-sessions">77</div>
                     <div class="metric-trend trend-up">↑ 4 new today</div>
                 </div>
-                <div class="metric-card glass fade-in" style="animation-delay: 0.3s;">
-                    <div class="metric-accent" style="background: #ef4444;"></div>
-                    <div class="metric-label">Build Goal Countdown</div>
-                    <div class="metric-value" id="m-countdown">1,018d</div>
-                    <div class="metric-trend">Target: 12/15/2028</div>
-                </div>
             </div>
 
             <div class="dashboard-layout">
-                <div class="glass" style="padding: 2rem;">
-                    <div class="card-header">
-                        <h2 class="card-title">Live Request Dispatcher</h2>
-                    </div>
-                    <div class="form-group">
-                        <textarea id="live-dispatch-input" class="form-input" style="height: 120px; background: rgba(255,255,255,0.02); font-size: 1rem;" placeholder="Type a task for the agent network..."></textarea>
-                    </div>
-                    <div style="display: flex; gap: 1rem; align-items: center;">
-                        <select id="live-dispatch-target" class="form-input" style="width: 200px;">
-                            <option value="cal">Health Cal (cal)</option>
-                            <option value="vicky">Vicky (assistant)</option>
-                            <option value="network">Network Broadcast</option>
-                        </select>
-                        <button class="btn" style="flex-grow: 1;" onclick="dispatchLiveRequest()">Execute Request</button>
-                    </div>
-                </div>
                 <div class="glass" style="padding: 2rem;">
                     <div class="card-header">
                         <h2 class="card-title">OpenClaw Telemetry</h2>
