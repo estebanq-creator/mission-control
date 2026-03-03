@@ -323,7 +323,7 @@
                     <div class="metric-accent" style="background: #10b981;"></div>
                     <div class="metric-label">Active Sessions</div>
                     <div class="metric-value" id="m-active-sessions">77</div>
-                    <div class="metric-trend trend-up">↑ 4 new today</div>
+                    <div class="metric-trend" id="m-stale-sessions" style="color: var(--text-secondary);">Stale: 0</div>
                 </div>
             </div>
 
@@ -404,7 +404,7 @@
 
     <script>
         const defaultData = {
-            system: { gateway: 'Active', latency: '12ms', tokens: '0.2k', sessions: 0, cost: '$0.000063' },
+            system: { gateway: 'Active', latency: '12ms', tokens: '0.2k', sessions: 68, stale: 5, cost: '$6.3e-05' },
             agents: [
                 { 
                     id: 'cal', 
@@ -509,6 +509,7 @@
             document.getElementById('m-token-usage').textContent = state.system.tokens;
             document.getElementById('m-total-cost').textContent = 'Cost: ' + (state.system.cost || '$0.00');
             document.getElementById('m-active-sessions').textContent = state.system.sessions;
+            document.getElementById('m-stale-sessions').textContent = 'Stale (>24h): ' + (state.system.stale || '0');
             
             const feed = document.getElementById('activity-feed');
             feed.innerHTML = state.activity.map(a => `<div class="feed-item"><span class="feed-ts">${a.ts}</span><div class="feed-msg">${a.msg}</div></div>`).join('');
