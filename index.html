@@ -446,8 +446,30 @@
         const defaultData = {
             system: { gateway: 'Active', latency: '12ms', tokens: '0.2k', sessions: 0, cost: '$6.3e-05' },
             agents: [
-                { id: 'cal', name: 'Health Cal', role: 'Expert Fitness Coach', model: 'gemini-3-flash-preview', status: 'online', lastActive: 'Just now', desc: 'Expert cycling coach.', capabilities: ['Strava', 'Nutrition'], logs: [] },
-                { id: 'vicky', name: 'Vicky', role: 'Personal Assistant', model: 'mistral-nemo', status: 'busy', lastActive: '5m ago', desc: 'General assistant.', capabilities: ['Calendar', 'Email'], logs: [] }
+                { 
+                    id: 'cal', 
+                    name: 'Health Cal', 
+                    role: 'Expert Fitness Coach', 
+                    model: 'gemini-3-flash-preview', 
+                    status: 'online', 
+                    lastActive: 'Just now', 
+                    desc: 'Expert fitness, nutrition, and cycling coach focused on metrics and habits. Specialized in Strava data analysis and long-term performance optimization.', 
+                    capabilities: ['Strava Analysis', 'Nutrition Planning', 'Workout Generation', 'Heartbeat Monitoring'], 
+                    logs: ['16:04: Heartbeat OK', '15:55: Processed morning brief', '14:30: Analyzed recovery metrics'],
+                    performance: 'High efficiency; average response latency < 2s. Consistent goal tracking accuracy.'
+                },
+                { 
+                    id: 'vicky', 
+                    name: 'Vicky', 
+                    role: 'Personal Assistant', 
+                    model: 'mistral-nemo', 
+                    status: 'busy', 
+                    lastActive: '5m ago', 
+                    desc: 'Versatile personal assistant managing scheduling, communications, and general administrative tasks.', 
+                    capabilities: ['Calendar Management', 'Email Drafting', 'Market Research', 'State Management'], 
+                    logs: ['16:08: Drafting response to client', '15:30: Organized daily schedule', '14:15: Vercel deployment sync'],
+                    performance: 'Highly reliable for low-latency administrative tasks. Occasional context overflow on long sessions.'
+                }
             ],
             tasks: [],
             decisions: [],
@@ -568,6 +590,83 @@
         }
         function renderDecisions() { /* Logic from previous version */ }
         function renderTeam() { /* Logic from previous version */ }
+
+        function openAgentPanel(id) {
+            const agent = state.agents.find(a => a.id === id);
+            const content = document.getElementById('agent-panel-content');
+            content.innerHTML = `
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:2rem;">
+                    <h2 style="font-weight:700;">${agent.name}</h2>
+                    <button class="btn-ghost" onclick="closePanel()">×</button>
+                </div>
+                <div class="agent-id-tag" style="margin-bottom:1.5rem;">${agent.model}</div>
+                
+                <h4 class="section-title">Description</h4>
+                <p style="font-size:0.9rem; margin-bottom:1.5rem; color:var(--text-primary); line-height:1.6;">${agent.desc}</p>
+                
+                <h4 class="section-title">Capabilities</h4>
+                <div style="display:flex; flex-wrap:wrap; gap:8px; margin-bottom:1.5rem;">
+                    ${agent.capabilities.map(c => `<span style="font-size:0.75rem; background:rgba(255,255,255,0.05); padding:4px 10px; border-radius:20px; border:1px solid var(--border-subtle);">${c}</span>`).join('')}
+                </div>
+
+                <h4 class="section-title">Performance Notes</h4>
+                <p style="font-size:0.85rem; margin-bottom:1.5rem; color:var(--accent); font-style:italic;">${agent.performance || 'No specific notes available.'}</p>
+
+                <h4 class="section-title">Recent Activity Log</h4>
+                <div class="feed-container" style="max-height:200px; margin-bottom:2rem; background:rgba(0,0,0,0.2); padding:10px; border-radius:8px;">
+                    ${agent.logs && agent.logs.length ? agent.logs.map(l => `<div style="font-size:0.8rem; padding:8px 0; border-bottom:1px solid var(--border-subtle);">${l}</div>`).join('') : '<div style="font-size:0.8rem; color:var(--text-secondary);">No logs found.</div>'}
+                </div>
+
+                <button class="btn" style="width:100%;" onclick="openAgentTaskModal('${agent.id}')">Send Task Request</button>
+            `;
+            document.getElementById('agent-panel').classList.add('active');
+            document.getElementById('panel-overlay').classList.add('active');
+        }
+
+        function closePanel() {
+            document.getElementById('agent-panel').classList.remove('active');
+            document.getElementById('panel-overlay').classList.remove('active');
+        }
+
+        function openAgentTaskModal(id) {
+            document.getElementById('at-input-agent-id').value = id;
+            const agent = state.agents.find(a => a.id === id);
+            document.getElementById('agent-task-title').textContent = `Task to ${agent.name}`;
+            openModal('agent-task');
+        }
+
+        function dispatchAgentTask() {
+            const id = document.getElementById('at-input-agent-id').value;
+            const req = document.getElementById('at-input-request').value;
+            if(!req) return;
+            
+            const agent = state.agents.find(a => a.id === id);
+            agent.logs.unshift(`Task: ${req}`);
+            agent.lastActive = 'Just now';
+            
+            state.activity.unshift({ ts: new Date().toLocaleTimeString().slice(0,5), msg: `Dispatched task to ${agent.name}` });
+            
+            saveState();
+            closeModal();
+            closePanel();
+            renderAgentGrid();
+        }
+
+        function saveDecision() {
+            const summary = document.getElementById('d-input-decision').value;
+            if(!summary) return;
+            
+            state.decisions.unshift({
+                date: new Date().toISOString().split('T')[0],
+                question: 'Manual Entry',
+                summary,
+                agents: ['CEO']
+            });
+            
+            saveState();
+            closeModal();
+            renderDecisions();
+        }
 
         function updateClock() {
             const now = new Date();
