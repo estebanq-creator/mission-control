@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OpenClaw | Live Mission Control</title>
+    <title>OpenClaw | Mission Control</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -32,7 +32,6 @@
             min-height: 100vh;
         }
 
-        /* Animations */
         @keyframes fadeInUp {
             from { opacity: 0; transform: translateY(20px); }
             to { opacity: 1; transform: translateY(0); }
@@ -46,7 +45,6 @@
 
         .fade-in { animation: fadeInUp 0.6s ease-out forwards; }
 
-        /* Glassmorphism */
         .glass {
             background: var(--card-bg);
             backdrop-filter: blur(20px);
@@ -61,7 +59,6 @@
             background: rgba(255, 255, 255, 0.05);
         }
 
-        /* Header */
         header {
             position: sticky;
             top: 0;
@@ -117,7 +114,6 @@
             border-radius: 4px;
         }
 
-        /* Main Content */
         main {
             max-width: 1600px;
             margin: 0 auto;
@@ -127,14 +123,13 @@
         .tab-content { display: none; }
         .tab-content.active { display: block; animation: fadeInUp 0.4s ease-out; }
 
-        /* Dashboard Specific */
         .welcome-bar { margin-bottom: 2.5rem; }
         .welcome-title { font-size: 2rem; font-weight: 700; margin-bottom: 0.5rem; }
         .welcome-sub { color: var(--text-secondary); font-size: 1rem; }
 
         .metrics-grid {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
+            grid-template-columns: 2fr 1fr 1fr;
             gap: 1.5rem;
             margin-bottom: 2.5rem;
         }
@@ -152,8 +147,6 @@
         .metric-label { font-size: 0.8rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 1px; }
         .metric-value { font-size: 1.75rem; font-weight: 700; margin: 0.5rem 0; }
         .metric-trend { font-size: 0.8rem; display: flex; align-items: center; gap: 4px; }
-        .trend-up { color: var(--success); }
-        .trend-down { color: var(--danger); }
 
         .dashboard-layout {
             display: grid;
@@ -161,7 +154,6 @@
             gap: 1.5rem;
         }
 
-        /* Priorities & Feed */
         .card-header {
             display: flex;
             justify-content: space-between;
@@ -169,28 +161,6 @@
             margin-bottom: 1.5rem;
         }
         .card-title { font-size: 1.1rem; font-weight: 600; }
-
-        .priority-list { list-style: none; }
-        .priority-item {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 0.75rem 0;
-            border-bottom: 1px solid var(--border-subtle);
-        }
-        .priority-item:last-child { border: none; }
-        input[type="checkbox"] {
-            appearance: none;
-            width: 18px; height: 18px;
-            border: 2px solid var(--border-subtle);
-            border-radius: 4px;
-            cursor: pointer;
-            transition: var(--transition);
-        }
-        input[type="checkbox"]:checked {
-            background: var(--accent);
-            border-color: var(--accent);
-        }
 
         .feed-container { max-height: 400px; overflow-y: auto; padding-right: 10px; }
         .feed-item {
@@ -201,7 +171,6 @@
         .feed-ts { font-size: 0.7rem; color: var(--text-secondary); }
         .feed-msg { font-size: 0.85rem; margin-top: 2px; }
 
-        /* Kanban */
         .kanban-board {
             display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem;
         }
@@ -213,12 +182,10 @@
         .p-medium { background: rgba(245, 158, 11, 0.15); color: var(--warning); }
         .p-low { background: rgba(16, 185, 129, 0.15); color: var(--success); }
 
-        /* Agent Grid Specifics */
         .agent-card-v2 { padding: 1.5rem; position: relative; cursor: pointer; }
         .agent-status-v2 { position: absolute; top: 1.5rem; right: 1.5rem; display: flex; align-items: center; gap: 6px; font-size: 0.7rem; }
         .agent-id-tag { font-size: 0.65rem; color: var(--accent); background: rgba(0, 210, 255, 0.1); padding: 2px 6px; border-radius: 4px; display: inline-block; margin-top: 8px; }
         
-        /* Slide-out Panel */
         .slide-panel {
             position: fixed; right: -400px; top: 0; bottom: 0; width: 400px; 
             background: var(--bg-primary); border-left: 1px solid var(--border-subtle);
@@ -229,20 +196,9 @@
         .panel-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); backdrop-filter: blur(4px); display: none; z-index: 1400; }
         .panel-overlay.active { display: block; }
 
-        /* Decision Log */
         .decision-item { padding: 1rem; border-bottom: 1px solid var(--border-subtle); font-size: 0.85rem; border-left: 3px solid var(--accent); margin-bottom: 0.5rem; background: rgba(255,255,255,0.01); }
         .decision-ts { font-size: 0.7rem; color: var(--text-secondary); margin-bottom: 4px; display: block; }
 
-        /* Team Visualization */
-        .org-root { display: flex; flex-direction: column; align-items: center; margin-bottom: 3rem; }
-        .org-node { text-align: center; padding: 2rem; width: 320px; position: relative; }
-        .org-node::after { content: ''; position: absolute; bottom: -1.5rem; left: 50%; width: 2px; height: 1.5rem; background: var(--border-subtle); }
-        .mission-card { margin-bottom: 3rem; border-left: 4px solid var(--accent); position: relative; overflow: hidden; }
-        .mission-glow { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle at 20% 50%, rgba(0, 210, 255, 0.05), transparent); pointer-events: none; }
-        .team-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; width: 100%; }
-        .device-tag { font-size: 0.65rem; color: var(--text-secondary); margin-top: 8px; display: flex; align-items: center; gap: 4px; }
-
-        /* UI Elements */
         .btn {
             background: var(--accent); color: var(--bg-primary); border: none; padding: 0.6rem 1.2rem;
             border-radius: 8px; font-weight: 600; cursor: pointer; transition: var(--transition);
@@ -252,7 +208,6 @@
         .btn-ghost { background: transparent; color: var(--text-secondary); border: 1px solid var(--border-subtle); }
         .btn-ghost:hover { color: white; border-color: white; }
 
-        /* Modal */
         .modal {
             position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(8px);
             display: none; justify-content: center; align-items: center; z-index: 2000;
@@ -265,14 +220,12 @@
             padding: 0.75rem; border-radius: 8px; color: white; outline: none;
         }
 
-        /* Scrollbar */
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: var(--border-subtle); border-radius: 10px; }
 
         @media (max-width: 1200px) {
-            .metrics-grid { grid-template-columns: 1fr 1fr; }
-            .dashboard-layout { grid-template-columns: 1fr; }
+            .metrics-grid { grid-template-columns: 1fr; }
         }
     </style>
 </head>
@@ -306,60 +259,55 @@
                 <p class="welcome-sub" id="live-date">Tuesday, March 3rd, 2026</p>
             </div>
 
-            <div class="metrics-grid" style="grid-template-columns: 2fr 1fr 1fr;">
+            <div class="metrics-grid">
                 <!-- OpenClaw LLM Metrics Box -->
-                <div class="glass fade-in" style="padding: 1.5rem; position: relative; overflow: hidden; grid-row: span 1;">
+                <div class="glass fade-in" style="padding: 1.5rem; position: relative; overflow: hidden;">
                     <div class="metric-accent"></div>
-                    <div class="card-header" style="margin-bottom: 1.25rem;">
+                    <div class="card-header" style="margin-bottom: 1.5rem;">
                         <h2 class="card-title" style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; color: var(--text-secondary);">OpenClaw LLM Metrics</h2>
                     </div>
                     
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 1.25rem;">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 1.5rem;">
                         <div>
-                            <div style="font-size: 0.65rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 1px;">Daily Tokens</div>
-                            <div style="font-size: 1.75rem; font-weight: 700; margin: 0.15rem 0; color: var(--text-primary);">145,200</div>
-                            <div style="font-size: 0.65rem; color: var(--text-secondary); opacity: 0.8;">Weekly Consumption (840,500)</div>
+                            <div style="font-size: 0.7rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 1px;">Daily Tokens</div>
+                            <div style="font-size: 1.75rem; font-weight: 700; margin: 0.25rem 0; color: var(--text-primary);">145,200</div>
+                            <div style="font-size: 0.7rem; color: var(--text-secondary);">Weekly Consumption (840,500)</div>
                         </div>
                         <div>
-                            <div style="font-size: 0.65rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 1px;">Total Cost</div>
-                            <div style="font-size: 1.75rem; font-weight: 700; margin: 0.15rem 0; color: var(--text-primary);">$12.84</div>
-                            <div style="font-size: 0.65rem; color: var(--warning); font-weight: 500;">42% of 2M Alert</div>
+                            <div style="font-size: 0.7rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 1px;">Total Cost</div>
+                            <div style="font-size: 1.75rem; font-weight: 700; margin: 0.25rem 0; color: var(--text-primary);">$12.84</div>
+                            <div style="font-size: 0.7rem; color: var(--warning);">42% of 2M Alert</div>
                         </div>
                     </div>
 
-                    <div style="height: 1px; background: var(--border-subtle); margin-bottom: 1.25rem;"></div>
+                    <div style="height: 1px; background: var(--border-subtle); margin-bottom: 1.5rem;"></div>
 
-                    <div style="display: grid; grid-template-columns: 1.5fr 1fr; gap: 1rem;">
-                        <div>
-                            <span style="font-size: 0.65rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 1px; display: block; margin-bottom: 0.75rem;">Model Breakdown</span>
-                            <div style="display: flex; flex-direction: column; gap: 0.6rem;">
-                                <div style="display: grid; grid-template-columns: 1fr auto auto; gap: 1rem; font-size: 0.8rem;">
-                                    <span style="color: var(--text-primary);">google/gemini-3-flash...</span>
-                                    <span style="color: var(--text-secondary);">680,000</span>
-                                    <span style="color: var(--accent); font-weight: 600;">$10.20</span>
-                                </div>
-                                <div style="display: grid; grid-template-columns: 1fr auto auto; gap: 1rem; font-size: 0.8rem;">
-                                    <span style="color: var(--text-primary);">ollama/mistral-nemo</span>
-                                    <span style="color: var(--text-secondary);">120,500</span>
-                                    <span style="color: var(--success); font-weight: 600;">Free</span>
-                                </div>
-                                <div style="display: grid; grid-template-columns: 1fr auto auto; gap: 1rem; font-size: 0.8rem;">
-                                    <span style="color: var(--text-primary);">claude-3-5-sonnet</span>
-                                    <span style="color: var(--text-secondary);">40,000</span>
-                                    <span style="color: var(--accent); font-weight: 600;">$2.64</span>
-                                </div>
-                            </div>
+                    <div>
+                        <div style="display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 1rem; margin-bottom: 0.75rem;">
+                            <span style="font-size: 0.65rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 1px;">Breakdown</span>
+                            <span style="font-size: 0.65rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 1px; text-align: right;">Tokens</span>
+                            <span style="font-size: 0.65rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 1px; text-align: right;">Cost</span>
                         </div>
-                        <div style="text-align: right;">
-                            <span style="font-size: 0.65rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 1px; display: block; margin-bottom: 0.75rem;">Agent Breakdown</span>
-                            <div style="font-size: 0.75rem; color: var(--text-secondary);">
-                                <div style="margin-bottom: 4px;">Cal: <span style="color: var(--text-primary);">75%</span></div>
-                                <div style="margin-bottom: 4px;">Vicky: <span style="color: var(--text-primary);">20%</span></div>
-                                <div>System: <span style="color: var(--text-primary);">5%</span></div>
+                        <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                            <div style="display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 1rem; font-size: 0.8rem; padding-bottom: 0.4rem; border-bottom: 1px solid rgba(255,255,255,0.02);">
+                                <span style="color: var(--text-primary);">google/gemini-3-flash...</span>
+                                <span style="text-align: right; color: var(--text-secondary);">680,000</span>
+                                <span style="text-align: right; color: var(--accent); font-weight: 600;">$10.20</span>
+                            </div>
+                            <div style="display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 1rem; font-size: 0.8rem; padding-bottom: 0.4rem; border-bottom: 1px solid rgba(255,255,255,0.02);">
+                                <span style="color: var(--text-primary);">ollama/mistral-nemo</span>
+                                <span style="text-align: right; color: var(--text-secondary);">120,500</span>
+                                <span style="text-align: right; color: var(--success); font-weight: 600;">Free</span>
+                            </div>
+                            <div style="display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 1rem; font-size: 0.8rem;">
+                                <span style="color: var(--text-primary);">claude-3-5-sonnet</span>
+                                <span style="text-align: right; color: var(--text-secondary);">40,000</span>
+                                <span style="text-align: right; color: var(--accent); font-weight: 600;">$2.64</span>
                             </div>
                         </div>
                     </div>
                 </div>
+
                 <div class="metric-card glass fade-in" style="animation-delay: 0.1s;">
                     <div class="metric-accent" style="background: #a855f7;"></div>
                     <div class="metric-label">LLM Total Tokens</div>
@@ -370,7 +318,7 @@
                     <div class="metric-accent" style="background: #10b981;"></div>
                     <div class="metric-label">Active Sessions</div>
                     <div class="metric-value" id="m-active-sessions">77</div>
-                    <div class="metric-trend" id="m-stale-sessions" style="color: var(--text-secondary);">Stale: 0</div>
+                    <div class="metric-trend" id="m-stale-sessions" style="color: var(--text-secondary);">Stale (>24h): 0</div>
                 </div>
             </div>
 
@@ -379,8 +327,36 @@
                     <div class="card-header">
                         <h2 class="card-title">OpenClaw Telemetry</h2>
                     </div>
-                    <div id="activity-feed" class="feed-container">
-                        <!-- Items injected by JS -->
+                    <div id="activity-feed" class="feed-container"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Command Center Tab -->
+        <section id="agents" class="tab-content">
+            <div class="dashboard-layout" style="display: grid; grid-template-columns: 1.5fr 1fr; gap: 1.5rem;">
+                <div style="display: flex; flex-direction: column; gap: 2rem;">
+                    <div>
+                        <span class="section-title">Active AI Agent Network</span>
+                        <div id="agent-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1.5rem;"></div>
+                    </div>
+                    <div>
+                        <span class="section-title">Cron Engine & Scheduled Tasks</span>
+                        <div class="glass" style="padding: 1.5rem;">
+                            <div class="card-header">
+                                <h2 class="card-title">Autonomous Operations</h2>
+                                <div id="cron-engine-status" class="status-badge online">
+                                    <div class="status-dot"></div> ENGINE: PORT 8899 ONLINE
+                                </div>
+                            </div>
+                            <div id="cron-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1rem;"></div>
+                        </div>
+                    </div>
+                </div>
+                <div style="display: flex; flex-direction: column; gap: 2rem;">
+                    <div class="glass" style="padding: 1.5rem;">
+                        <div class="card-header"><h2 class="card-title">Proactivity Log</h2></div>
+                        <div id="proactivity-log" class="feed-container" style="max-height: 500px;"></div>
                     </div>
                 </div>
             </div>
@@ -404,38 +380,6 @@
             </div>
         </section>
 
-        <!-- Command Center Tab -->
-        <section id="agents" class="tab-content">
-            <div class="dashboard-layout" style="grid-template-columns: 1.5fr 1fr;">
-                <div style="display: flex; flex-direction: column; gap: 2rem;">
-                    <div>
-                        <span class="section-title">Active AI Agent Network</span>
-                        <div id="agent-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1.5rem;"></div>
-                    </div>
-                    
-                    <div>
-                        <span class="section-title">Cron Engine & Scheduled Tasks</span>
-                        <div class="glass" style="padding: 1.5rem;">
-                            <div class="card-header">
-                                <h2 class="card-title">Autonomous Operations</h2>
-                                <div id="cron-engine-status" class="status-badge online">
-                                    <div class="status-dot"></div> ENGINE: PORT 8899 ONLINE
-                                </div>
-                            </div>
-                            <div id="cron-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1rem;"></div>
-                        </div>
-                    </div>
-                </div>
-
-                <div style="display: flex; flex-direction: column; gap: 2rem;">
-                    <div class="glass" style="padding: 1.5rem;">
-                        <div class="card-header"><h2 class="card-title">Proactivity Log</h2></div>
-                        <div id="proactivity-log" class="feed-container" style="max-height: 300px;"></div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
         <!-- Notes Tab -->
         <section id="notes" class="tab-content">
             <div class="glass" style="padding: 1rem;"><textarea id="notes-input" class="notes-area"></textarea></div>
@@ -444,57 +388,43 @@
 
     <!-- Modals & Panels -->
     <div id="modal-task" class="modal"><div class="modal-content glass"><h2>Add Task</h2><input type="hidden" id="task-input-status"><div class="form-group"><label class="form-label">Title</label><input type="text" id="t-input-title" class="form-input"></div><div class="form-group"><label class="form-label">Priority</label><select id="t-input-priority" class="form-input"><option value="high">High</option><option value="medium">Medium</option><option value="low">Low</option></select></div><button class="btn" onclick="saveTask()">Save Task</button></div></div>
-    <div id="modal-agent-task" class="modal"><div class="modal-content glass"><h2>Dispatch Task</h2><input type="hidden" id="at-input-agent-id"><textarea id="at-input-request" class="form-input"></textarea><button class="btn" onclick="dispatchAgentTask()">Dispatch</button></div></div>
-    <div id="modal-decision" class="modal"><div class="modal-content glass"><h2>Log Decision</h2><textarea id="d-input-decision" class="form-input"></textarea><button class="btn" onclick="saveDecision()">Log</button></div></div>
+    <div id="modal-agent-task" class="modal"><div class="modal-content glass"><h2>Dispatch Task</h2><input type="hidden" id="at-input-agent-id"><textarea id="at-input-request" class="form-input" style="height:100px;"></textarea><button class="btn" onclick="dispatchAgentTask()">Dispatch</button></div></div>
     <div id="panel-overlay" class="panel-overlay" onclick="closePanel()"></div>
     <div id="agent-panel" class="slide-panel glass"><div id="agent-panel-content"></div></div>
 
     <script>
         const defaultData = {
-            system: { gateway: 'Active', latency: '12ms', tokens: '0.2k', sessions: 68, stale: 5, cost: '$6.3e-05' },
+            system: { gateway: 'Active', latency: '12ms', tokens: '0.2k', sessions: 68, stale: 5, cost: '$0.000063' },
             agents: [
                 { 
-                    id: 'cal', 
-                    name: 'Health Cal', 
-                    role: 'Expert Fitness & Cycling Coach', 
-                    model: 'google/gemini-3-flash-preview', 
-                    status: 'online', 
-                    lastActive: 'Just now', 
-                    desc: 'Expert fitness, nutrition, and cycling coach focused on metrics and habits. Specialized in Strava data analysis and long-term performance optimization.', 
-                    capabilities: ['Strava Analysis', 'Nutrition Planning', 'Workout Generation', 'Heartbeat Monitoring'], 
-                    logs: ['16:04: Heartbeat OK', '15:55: Processed morning brief', '14:30: Analyzed recovery metrics'],
-                    performance: 'High efficiency; average response latency < 2s. Consistent goal tracking accuracy.'
+                    id: 'cal', name: 'Health Cal', role: 'Expert Fitness & Cycling Coach', 
+                    model: 'gemini-3-flash-preview', status: 'online', lastActive: 'Just now', 
+                    desc: 'Expert fitness, nutrition, and cycling coach focused on metrics and habits. Specialized in Strava data analysis.', 
+                    capabilities: ['Strava Analysis', 'Nutrition', 'Workouts'], 
+                    logs: ['16:04: Heartbeat OK', '15:55: Processed brief'],
+                    performance: 'High efficiency; latency < 2s.'
                 },
                 { 
-                    id: 'vicky', 
-                    name: 'Vicky', 
-                    role: 'Personal Assistant', 
-                    model: 'mistral-nemo', 
-                    status: 'busy', 
-                    lastActive: '5m ago', 
-                    desc: 'Versatile personal assistant managing scheduling, communications, and general administrative tasks.', 
-                    capabilities: ['Calendar Management', 'Email Drafting', 'Market Research', 'State Management'], 
-                    logs: ['16:08: Drafting response to client', '15:30: Organized daily schedule', '14:15: Vercel deployment sync'],
-                    performance: 'Highly reliable for low-latency administrative tasks. Occasional context overflow on long sessions.'
+                    id: 'vicky', name: 'Vicky', role: 'Personal Assistant', 
+                    model: 'mistral-nemo', status: 'busy', lastActive: '5m ago', 
+                    desc: 'Versatile personal assistant managing scheduling and communications.', 
+                    capabilities: ['Calendar', 'Email', 'Research'], 
+                    logs: ['16:08: Drafting response'],
+                    performance: 'Highly reliable for admin tasks.'
                 }
             ],
             tasks: [],
-            decisions: [],
             activity: [
-                { ts: '16:35', msg: 'System automation: Hourly stats sync enabled.' },
-                { ts: '16:32', msg: 'Updated Mission Control to v2.1 (Live Requests)' },
-                { ts: '16:18', msg: 'System heartbeat normal.' }
+                { ts: '18:45', msg: 'Updated LLM Metrics module in dashboard.' },
+                { ts: '16:35', msg: 'System automation: Hourly stats sync enabled.' }
             ],
             cron: [
-                { id: 1, name: 'Morning Research Brief', frequency: 'Daily at 8:00 AM', last: '2026-03-03 08:00', next: '2026-03-04 08:00', status: 'success' },
-                { id: 2, name: 'Mission Control Stats Update', frequency: 'Hourly at :00', last: '2026-03-03 16:00', next: '2026-03-03 17:00', status: 'success' },
-                { id: 3, name: 'OpenClaw System Audit', frequency: 'Daily at 12:00 PM', last: '2026-03-03 12:00', next: '2026-03-04 12:00', status: 'success' },
-                { id: 4, name: 'Log Stale Cleanup', frequency: 'Daily at 4:00 AM', last: '2026-03-03 04:00', next: '2026-03-04 04:00', status: 'failed' }
+                { id: 1, name: 'Morning Brief', frequency: 'Daily 8AM', last: '2026-03-03 08:00', next: '2026-03-04 08:00', status: 'success' },
+                { id: 2, name: 'Stats Sync', frequency: 'Hourly', last: '2026-03-03 18:00', next: '2026-03-03 19:00', status: 'success' }
             ],
             proactivity: [
-                { ts: '16:00', msg: 'Updated Mission Control stats autonomously.' },
-                { ts: '12:00', msg: 'System security audit completed; 1 critical warning found.' },
-                { ts: '08:00', msg: 'Morning research brief delivered to channel: #Briefs.' }
+                { ts: '18:00', msg: 'Completed hourly dashboard stats update.' },
+                { ts: '12:00', msg: 'Completed daily security audit.' }
             ],
             notes: ""
         };
@@ -513,46 +443,10 @@
 
         function renderTab(tabId) {
             if (tabId === 'dashboard') renderDashboard();
-            if (tabId === 'projects') renderKanban();
             if (tabId === 'agents') { renderAgentGrid(); renderCronGrid(); renderProactivityLog(); }
         }
 
-        function renderCronGrid() {
-            const grid = document.getElementById('cron-grid');
-            if(!grid) return;
-            grid.innerHTML = '';
-            state.cron.forEach(job => {
-                const color = job.status === 'success' ? 'var(--success)' : 'var(--danger)';
-                grid.innerHTML += `
-                    <div class="glass" style="padding: 1.25rem;">
-                        <div style="font-weight: 700; font-size: 0.9rem; margin-bottom: 4px;">${job.name}</div>
-                        <div style="font-size: 0.7rem; color: var(--accent); margin-bottom: 12px;">${job.frequency}</div>
-                        <div style="display: flex; flex-direction: column; gap: 4px; font-size: 0.65rem; color: var(--text-secondary);">
-                            <div>Last: <span style="color: var(--text-primary);">${job.last}</span> <span style="color: ${color};">• ${job.status.toUpperCase()}</span></div>
-                            <div>Next: <span style="color: var(--text-primary);">${job.next}</span></div>
-                        </div>
-                    </div>
-                `;
-            });
-        }
-
-        function renderProactivityLog() {
-            const log = document.getElementById('proactivity-log');
-            if(!log) return;
-            log.innerHTML = '';
-            state.proactivity.forEach(p => {
-                log.innerHTML += `
-                    <div class="decision-item" style="border-left-color: var(--success); margin-bottom: 0.75rem; padding: 0.75rem;">
-                        <span class="decision-ts">${p.ts}</span>
-                        <div style="font-size: 0.8rem;">${p.msg}</div>
-                    </div>
-                `;
-            });
-        }
-
         function renderDashboard() {
-            document.getElementById('m-gateway-status').textContent = state.system.gateway;
-            document.getElementById('m-gateway-latency').textContent = state.system.latency + ' latency';
             document.getElementById('m-token-usage').textContent = state.system.tokens;
             document.getElementById('m-total-cost').textContent = 'Cost: ' + (state.system.cost || '$0.00');
             document.getElementById('m-active-sessions').textContent = state.system.sessions;
@@ -562,68 +456,50 @@
             feed.innerHTML = state.activity.map(a => `<div class="feed-item"><span class="feed-ts">${a.ts}</span><div class="feed-msg">${a.msg}</div></div>`).join('');
         }
 
-        function dispatchLiveRequest() {
-            const input = document.getElementById('live-dispatch-input');
-            const target = document.getElementById('live-dispatch-target');
-            if(!input.value) return;
-            state.activity.unshift({ ts: new Date().toLocaleTimeString().slice(0,5), msg: `[REQUEST] to ${target.value}: ${input.value}` });
-            input.value = '';
-            saveState();
-            renderDashboard();
-        }
-
-        function renderKanban() { /* Simplified Kanban logic */ }
         function renderAgentGrid() {
             const grid = document.getElementById('agent-grid');
-            grid.innerHTML = '';
-            state.agents.forEach(agent => {
-                const statusColor = agent.status === 'online' ? 'var(--success)' : agent.status === 'busy' ? 'var(--warning)' : '#6b7280';
-                grid.innerHTML += `
-                    <div class="glass agent-card-v2 fade-in" onclick="openAgentPanel('${agent.id}')">
-                        <div class="agent-status-v2">
-                            <div style="width:8px; height:8px; border-radius:50%; background:${statusColor}; box-shadow: 0 0 8px ${statusColor}"></div>
-                            ${agent.status.toUpperCase()}
-                        </div>
-                        <div style="font-weight:700; font-size:1.1rem; margin-bottom: 4px;">${agent.name}</div>
-                        <div style="font-size:0.75rem; color:var(--accent); font-weight:600; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:12px;">${agent.role}</div>
-                        
-                        <div style="display:flex; flex-direction:column; gap:8px;">
-                            <div style="font-size:0.7rem; color:var(--text-secondary);">Model: <span style="color:var(--text-primary)">${agent.model}</span></div>
-                            <div style="font-size:0.7rem; color:var(--text-secondary);">Last active: <span style="color:var(--text-primary)">${agent.lastActive}</span></div>
-                        </div>
+            grid.innerHTML = state.agents.map(agent => `
+                <div class="glass agent-card-v2 fade-in" onclick="openAgentPanel('${agent.id}')">
+                    <div class="agent-status-v2">
+                        <div style="width:8px; height:8px; border-radius:50%; background:${agent.status==='online'?'var(--success)':'var(--warning)'}"></div>
+                        ${agent.status.toUpperCase()}
                     </div>
-                `;
-            });
+                    <div style="font-weight:700; font-size:1.1rem;">${agent.name}</div>
+                    <div style="font-size:0.75rem; color:var(--accent); text-transform:uppercase;">${agent.role}</div>
+                    <div class="agent-id-tag">${agent.model}</div>
+                </div>
+            `).join('');
         }
-        function renderDecisions() { /* Logic from previous version */ }
+
+        function renderCronGrid() {
+            const grid = document.getElementById('cron-grid');
+            grid.innerHTML = state.cron.map(job => `
+                <div class="glass" style="padding: 1.25rem;">
+                    <div style="font-weight: 700;">${job.name}</div>
+                    <div style="font-size: 0.7rem; color: var(--accent);">${job.frequency}</div>
+                    <div style="font-size: 0.65rem; color: var(--text-secondary); margin-top: 8px;">Last: ${job.last}</div>
+                </div>
+            `).join('');
+        }
+
+        function renderProactivityLog() {
+            const log = document.getElementById('proactivity-log');
+            log.innerHTML = state.proactivity.map(p => `
+                <div class="decision-item" style="border-left-color: var(--success); padding: 0.75rem;">
+                    <span class="decision-ts">${p.ts}</span>
+                    <div style="font-size: 0.8rem;">${p.msg}</div>
+                </div>
+            `).join('');
+        }
 
         function openAgentPanel(id) {
             const agent = state.agents.find(a => a.id === id);
-            const content = document.getElementById('agent-panel-content');
-            content.innerHTML = `
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:2rem;">
-                    <h2 style="font-weight:700;">${agent.name}</h2>
-                    <button class="btn-ghost" onclick="closePanel()">×</button>
-                </div>
+            document.getElementById('agent-panel-content').innerHTML = `
+                <h2 style="font-weight:700;">${agent.name}</h2>
                 <div class="agent-id-tag" style="margin-bottom:1.5rem;">${agent.model}</div>
-                
-                <h4 class="section-title">Description</h4>
-                <p style="font-size:0.9rem; margin-bottom:1.5rem; color:var(--text-primary); line-height:1.6;">${agent.desc}</p>
-                
-                <h4 class="section-title">Capabilities</h4>
-                <div style="display:flex; flex-wrap:wrap; gap:8px; margin-bottom:1.5rem;">
-                    ${agent.capabilities.map(c => `<span style="font-size:0.75rem; background:rgba(255,255,255,0.05); padding:4px 10px; border-radius:20px; border:1px solid var(--border-subtle);">${c}</span>`).join('')}
-                </div>
-
-                <h4 class="section-title">Performance Notes</h4>
-                <p style="font-size:0.85rem; margin-bottom:1.5rem; color:var(--accent); font-style:italic;">${agent.performance || 'No specific notes available.'}</p>
-
-                <h4 class="section-title">Recent Activity Log</h4>
-                <div class="feed-container" style="max-height:200px; margin-bottom:2rem; background:rgba(0,0,0,0.2); padding:10px; border-radius:8px;">
-                    ${agent.logs && agent.logs.length ? agent.logs.map(l => `<div style="font-size:0.8rem; padding:8px 0; border-bottom:1px solid var(--border-subtle);">${l}</div>`).join('') : '<div style="font-size:0.8rem; color:var(--text-secondary);">No logs found.</div>'}
-                </div>
-
-                <button class="btn" style="width:100%;" onclick="openAgentTaskModal('${agent.id}')">Send Task Request</button>
+                <h4 class="section-title">Description</h4><p style="font-size:0.9rem; margin-bottom:1.5rem;">${agent.desc}</p>
+                <h4 class="section-title">Performance</h4><p style="font-size:0.85rem; color:var(--accent);">${agent.performance}</p>
+                <button class="btn" style="width:100%; margin-top:2rem;" onclick="openAgentTaskModal('${agent.id}')">Send Task Request</button>
             `;
             document.getElementById('agent-panel').classList.add('active');
             document.getElementById('panel-overlay').classList.add('active');
@@ -636,49 +512,12 @@
 
         function openAgentTaskModal(id) {
             document.getElementById('at-input-agent-id').value = id;
-            const agent = state.agents.find(a => a.id === id);
-            document.getElementById('agent-task-title').textContent = `Task to ${agent.name}`;
-            openModal('agent-task');
-        }
-
-        function dispatchAgentTask() {
-            const id = document.getElementById('at-input-agent-id').value;
-            const req = document.getElementById('at-input-request').value;
-            if(!req) return;
-            
-            const agent = state.agents.find(a => a.id === id);
-            agent.logs.unshift(`Task: ${req}`);
-            agent.lastActive = 'Just now';
-            
-            state.activity.unshift({ ts: new Date().toLocaleTimeString().slice(0,5), msg: `Dispatched task to ${agent.name}` });
-            
-            saveState();
-            closeModal();
-            closePanel();
-            renderAgentGrid();
-        }
-
-        function saveDecision() {
-            const summary = document.getElementById('d-input-decision').value;
-            if(!summary) return;
-            
-            state.decisions.unshift({
-                date: new Date().toISOString().split('T')[0],
-                question: 'Manual Entry',
-                summary,
-                agents: ['CEO']
-            });
-            
-            saveState();
-            closeModal();
-            renderDecisions();
+            document.getElementById('modal-agent-task').style.display = 'flex';
         }
 
         function updateClock() {
             const now = new Date();
             document.getElementById('header-clock').textContent = now.toLocaleTimeString();
-            const target = new Date('2028-12-15');
-            document.getElementById('m-countdown').textContent = Math.floor((target - now) / 86400000) + 'd';
         }
 
         setInterval(updateClock, 1000);
