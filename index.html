@@ -277,6 +277,15 @@
         .decision-item { padding: 1rem; border-bottom: 1px solid var(--border-subtle); font-size: 0.85rem; border-left: 3px solid var(--accent); margin-bottom: 0.5rem; background: rgba(255,255,255,0.01); }
         .decision-ts { font-size: 0.7rem; color: var(--text-secondary); margin-bottom: 4px; display: block; }
 
+        /* Team Visualization */
+        .org-root { display: flex; flex-direction: column; align-items: center; margin-bottom: 3rem; }
+        .org-node { text-align: center; padding: 2rem; width: 320px; position: relative; }
+        .org-node::after { content: ''; position: absolute; bottom: -1.5rem; left: 50%; width: 2px; height: 1.5rem; background: var(--border-subtle); }
+        .mission-card { margin-bottom: 3rem; border-left: 4px solid var(--accent); position: relative; overflow: hidden; }
+        .mission-glow { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle at 20% 50%, rgba(0, 210, 255, 0.05), transparent); pointer-events: none; }
+        .team-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; width: 100%; }
+        .device-tag { font-size: 0.65rem; color: var(--text-secondary); margin-top: 8px; display: flex; align-items: center; gap: 4px; }
+        
         /* Scrollbar */
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-track { background: transparent; }
@@ -300,6 +309,7 @@
             <div class="nav-link" onclick="showTab('projects')">📋 Projects</div>
             <div class="nav-link" onclick="showTab('timeline')">📅 Timeline</div>
             <div class="nav-link" onclick="showTab('agents')">🏢 Command Center</div>
+            <div class="nav-link" onclick="showTab('team')">👥 Team</div>
             <div class="nav-link" onclick="showTab('notes')">📝 Notes</div>
         </nav>
         <div class="header-right">
@@ -422,6 +432,30 @@
                     </div>
                     <button class="btn" style="width: 100%; margin-top: 1.5rem;" onclick="openModal('decision')">Log Decision</button>
                 </div>
+            </div>
+        </section>
+
+        <!-- Team Tab -->
+        <section id="team" class="tab-content">
+            <div class="mission-card glass fade-in" style="padding: 2.5rem; text-align: center;">
+                <div class="mission-glow"></div>
+                <span class="section-title">North Star Mission Statement</span>
+                <h1 style="font-size: 1.75rem; font-weight: 700; margin-top: 1rem; letter-spacing: -0.5px;">"Empower Human Potential through an Autonomous, High-Performance Agent Network."</h1>
+                <p style="color: var(--text-secondary); margin-top: 1rem; max-width: 800px; margin-left: auto; margin-right: auto;">Providing Esteban Quinones with the data, strategy, and execution required to build a lasting legacy.</p>
+            </div>
+
+            <div class="org-root fade-in" style="animation-delay: 0.2s;">
+                <span class="section-title">Network Core</span>
+                <div class="glass org-node">
+                    <div style="font-size: 0.7rem; color: var(--accent); margin-bottom: 4px;">ORCHESTRATOR</div>
+                    <h2 style="font-weight: 700;">OpenClaw Root</h2>
+                    <div class="agent-id-tag">Claude 3.5 Sonnet</div>
+                    <div class="device-tag">📍 Esteban's MacBook Pro (Local)</div>
+                </div>
+            </div>
+
+            <div class="team-grid" id="team-grid">
+                <!-- Team sub-agents injected by JS -->
             </div>
         </section>
 
@@ -554,6 +588,11 @@
                     { text: 'Roofing', done: false }
                 ]}
             ],
+            team: [
+                { id: 'eng-1', name: 'Aris-T-Engineer', role: 'Chief Engineer', model: 'GPT-4o', location: 'Mac Mini Cluster' },
+                { id: 'res-1', name: 'Vantage-Researcher', role: 'Deep Researcher', model: 'Gemini 1.5 Pro', location: 'Esteban\'s PC' },
+                { id: 'cfo-1', name: 'Legacy-CFO', role: 'Chief Financial Officer', model: 'Claude 3 Opus', location: 'Local MacBook' }
+            ],
             activity: [
                 { ts: '16:04', msg: 'Updated Mission Control UI to v2.0' },
                 { ts: '15:52', msg: 'Added openrouter/gemini-3-pro model' }
@@ -582,6 +621,22 @@
             if (tabId === 'projects') renderKanban();
             if (tabId === 'timeline') renderTimeline();
             if (tabId === 'agents') { renderAgentGrid(); renderDecisions(); }
+            if (tabId === 'team') renderTeam();
+        }
+
+        function renderTeam() {
+            const grid = document.getElementById('team-grid');
+            grid.innerHTML = '';
+            state.team.forEach(m => {
+                grid.innerHTML += `
+                    <div class="glass agent-card-v2 fade-in" style="border-top: 2px solid var(--accent);">
+                        <div style="font-weight:700; font-size:1.1rem;">${m.name}</div>
+                        <div style="font-size:0.8rem; color:var(--text-secondary); margin-bottom:8px;">${m.role}</div>
+                        <div class="agent-id-tag">${m.model}</div>
+                        <div class="device-tag">📍 ${m.location}</div>
+                    </div>
+                `;
+            });
         }
 
         function renderAgentGrid() {
