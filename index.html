@@ -472,7 +472,28 @@
         }
 
         function renderKanban() { /* Simplified Kanban logic */ }
-        function renderAgentGrid() { /* Logic from previous version */ }
+        function renderAgentGrid() {
+            const grid = document.getElementById('agent-grid');
+            grid.innerHTML = '';
+            state.agents.forEach(agent => {
+                const statusColor = agent.status === 'online' ? 'var(--success)' : agent.status === 'busy' ? 'var(--warning)' : '#6b7280';
+                grid.innerHTML += `
+                    <div class="glass agent-card-v2 fade-in" onclick="openAgentPanel('${agent.id}')">
+                        <div class="agent-status-v2">
+                            <div style="width:8px; height:8px; border-radius:50%; background:${statusColor}; box-shadow: 0 0 8px ${statusColor}"></div>
+                            ${agent.status.toUpperCase()}
+                        </div>
+                        <div style="font-weight:700; font-size:1.1rem; margin-bottom: 4px;">${agent.name}</div>
+                        <div style="font-size:0.75rem; color:var(--accent); font-weight:600; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:12px;">${agent.role}</div>
+                        
+                        <div style="display:flex; flex-direction:column; gap:8px;">
+                            <div style="font-size:0.7rem; color:var(--text-secondary);">Model: <span style="color:var(--text-primary)">${agent.model}</span></div>
+                            <div style="font-size:0.7rem; color:var(--text-secondary);">Last active: <span style="color:var(--text-primary)">${agent.lastActive}</span></div>
+                        </div>
+                    </div>
+                `;
+            });
+        }
         function renderDecisions() { /* Logic from previous version */ }
         function renderTeam() { /* Logic from previous version */ }
 
