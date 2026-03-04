@@ -233,7 +233,7 @@
 
     <header>
         <div class="logo-group">
-            <div style="width: 10px; height: 10px; background: var(--accent); border-radius: 50%; animation: pulse 2s infinite;"></div>
+            <div id="status-dot-global" style="width: 10px; height: 10px; background: var(--danger); border-radius: 50%; transition: var(--transition);"></div>
             <span class="logo-text">OPENCLAW MISSION CONTROL</span>
         </div>
         <nav>
@@ -243,6 +243,7 @@
             <div class="nav-link" onclick="showTab('notes')">📝 Notes</div>
         </nav>
         <div class="header-right">
+            <span id="weather-display" style="font-size: 0.85rem; color: var(--accent); margin-right: 1rem; font-weight: 500;"></span>
             <div class="search-container">
                 <input type="text" id="global-search" class="search-input" placeholder="Dispatch Global Request...">
                 <span class="kbd-hint">⌘K</span>
@@ -333,8 +334,8 @@
                         <div class="glass" style="padding: 1.5rem;">
                             <div class="card-header">
                                 <h2 class="card-title">Autonomous Operations</h2>
-                                <div id="cron-engine-status" class="status-badge online">
-                                    <div class="status-dot"></div> ENGINE: PORT 8899 ONLINE
+                                <div id="cron-engine-status" class="status-badge offline">
+                                    <div class="status-dot"></div> ENGINE: PORT 8899 OFFLINE
                                 </div>
                             </div>
                             <div id="cron-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1rem;"></div>
@@ -381,49 +382,87 @@
     <div id="agent-panel" class="slide-panel glass"><div id="agent-panel-content"></div></div>
 
     <script>
+        const API_URL = 'http://localhost:8899';
         const defaultData = {
             system: {
-                gateway: 'Active',
-                latency: '12ms',
-                tokens: '0.2k',
-                sessions: 65,
-                stale: 6,
-                cost: '$6.3e-05',
-                dailyTokens: '0',
-                weeklyTokens: '235',
-                totalCostKPI: '$0.0',
-                modelBreakdown: [{"model": "gemini-3-flash-preview", "tokens": "235", "cost": "$0.0"}],
-                agentBreakdown: [{"agent": "Cal", "tokens": "1,207,995", "cost": "$0.12"}]
+                gateway: 'Active', latency: '12ms', tokens: '0k', sessions: 0, stale: 0, cost: '$0.00',
+                dailyTokens: '0', weeklyTokens: '0', totalCostKPI: '$0.00',
+                modelBreakdown: [], agentBreakdown: []
             },
-            agents: [
-                { 
-                    id: 'cal', name: 'Health Cal', role: 'Expert Fitness Coach', 
-                    model: 'gemini-3-flash-preview', status: 'online', lastActive: 'Just now', 
-                    desc: 'Expert fitness, nutrition, and cycling coach.', 
-                    capabilities: ['Strava', 'Nutrition'], logs: [], performance: 'High efficiency.'
-                },
-                { 
-                    id: 'vicky', name: 'Vicky', role: 'Personal Assistant', 
-                    model: 'mistral-nemo', status: 'busy', lastActive: '5m ago', 
-                    desc: 'Versatile personal assistant.', capabilities: ['Admin'], 
-                    logs: [], performance: 'Reliable.'
-                }
-            ],
-            tasks: [],
-            activity: [{ ts: '19:20', msg: 'Updated Mission Control agent breakdown.' }],
-            cron: [
-                { id: 1, name: 'Morning Brief', frequency: 'Daily 8AM', last: '2026-03-03 08:00', next: '2026-03-04 08:00', status: 'success' },
-                { id: 2, name: 'Stats Sync', frequency: 'Hourly', last: '2026-03-03 19:00', next: '2026-03-03 20:00', status: 'success' }
-            ],
-            proactivity: [
-                { ts: '19:00', msg: 'Completed hourly dashboard stats update.' }
-            ],
-            notes: ""
+            agents: [], tasks: [], activity: [], cron: [], proactivity: [], notes: ""
         };
 
         let state = JSON.parse(localStorage.getItem('openclaw_mission_control')) || defaultData;
-        function saveState() { localStorage.setItem('openclaw_mission_control', JSON.stringify(state)); }
 
+        // 1. Connectivity & Sync
+        async function syncServer() {
+            try {
+                const response = await fetch(`${API_URL}/mc/status`);
+                const status = await response.json();
+                
+                if (status.status === 'online') {
+                    document.getElementById('status-dot-global').style.background = 'var(--success)';
+                    document.getElementById('status-dot-global').style.boxShadow = '0 0 8px var(--success)';
+                    document.getElementById('cron-engine-status').className = 'status-badge online';
+                    document.getElementById('cron-engine-status').innerHTML = '<div class="status-dot"></div> ENGINE: PORT 8899 ONLINE';
+                }
+            } catch (e) {
+                document.getElementById('status-dot-global').style.background = 'var(--danger)';
+                document.getElementById('cron-engine-status').className = 'status-badge offline';
+                document.getElementById('cron-engine-status').innerHTML = '<div class="status-dot"></div> ENGINE: PORT 8899 OFFLINE';
+            }
+        }
+
+        async function loadData() {
+            try {
+                const response = await fetch(`${API_URL}/mc/data`);
+                const serverData = await response.json();
+                state = { ...state, ...serverData };
+                saveState(false); // Update local storage but don't loop POST
+                renderDashboard();
+            } catch (e) { console.warn("Local server data unavailable."); }
+        }
+
+        async function backupData() {
+            try {
+                await fetch(`${API_URL}/mc/data`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(state)
+                });
+            } catch (e) { console.error("Backup failed."); }
+        }
+
+        async function logToActivity(msg) {
+            const entry = { ts: new Date().toLocaleTimeString().slice(0,5), msg };
+            state.activity.unshift(entry);
+            saveState();
+            renderDashboard();
+            try {
+                await fetch(`${API_URL}/mc/activity`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: entry
+                });
+            } catch (e) {}
+        }
+
+        async function fetchWeather() {
+            try {
+                const response = await fetch(`${API_URL}/mc/weather?city=New York`);
+                const data = await response.json();
+                const temp = data.current_condition[0].temp_F;
+                const desc = data.current_condition[0].weatherDesc[0].value;
+                document.getElementById('weather-display').textContent = `NYC: ${temp}°F • ${desc}`;
+            } catch (e) {}
+        }
+
+        function saveState(backup = true) {
+            localStorage.setItem('openclaw_mission_control', JSON.stringify(state));
+            if (backup) backupData();
+        }
+
+        // 2. Tab Logic
         function showTab(tabId) {
             document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
             document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
@@ -468,7 +507,7 @@
 
         function renderAgentGrid() {
             const grid = document.getElementById('agent-grid');
-            grid.innerHTML = state.agents.map(agent => `
+            grid.innerHTML = (state.agents || []).map(agent => `
                 <div class="glass agent-card-v2 fade-in" onclick="openAgentPanel('${agent.id}')">
                     <div class="agent-status-v2">
                         <div style="width:8px; height:8px; border-radius:50%; background:${agent.status==='online'?'var(--success)':'var(--warning)'}"></div>
@@ -483,7 +522,7 @@
 
         function renderCronGrid() {
             const grid = document.getElementById('cron-grid');
-            grid.innerHTML = state.cron.map(job => `
+            grid.innerHTML = (state.cron || []).map(job => `
                 <div class="glass" style="padding: 1.25rem;">
                     <div style="font-weight: 700;">${job.name}</div>
                     <div style="font-size: 0.7rem; color: var(--accent);">${job.frequency}</div>
@@ -494,7 +533,7 @@
 
         function renderProactivityLog() {
             const log = document.getElementById('proactivity-log');
-            log.innerHTML = state.proactivity.map(p => `
+            log.innerHTML = (state.proactivity || []).map(p => `
                 <div class="decision-item" style="border-left-color: var(--success); padding: 0.75rem;">
                     <span class="decision-ts">${p.ts}</span>
                     <div style="font-size: 0.8rem;">${p.msg}</div>
@@ -524,14 +563,29 @@
             document.getElementById('modal-agent-task').style.display = 'flex';
         }
 
+        function dispatchAgentTask() {
+            const id = document.getElementById('at-input-agent-id').value;
+            const req = document.getElementById('at-input-request').value;
+            if(!req) return;
+            logToActivity(`[AGENT TASK] to ${id}: ${req}`);
+            document.getElementById('modal-agent-task').style.display = 'none';
+        }
+
         function updateClock() {
             const now = new Date();
             document.getElementById('header-clock').textContent = now.toLocaleTimeString();
         }
 
+        // Initialize
         setInterval(updateClock, 1000);
+        setInterval(syncServer, 5000);
+        setInterval(backupData, 300000); // 5 mins
+        setInterval(fetchWeather, 600000); // 10 mins
+        
         updateClock();
-        renderDashboard();
+        syncServer();
+        loadData();
+        fetchWeather();
     </script>
 </body>
 </html>
