@@ -408,8 +408,8 @@
                         "agentBreakdown": [
                                     {
                                                 "agent": "Cal",
-                                                "tokens": "806,149",
-                                                "cost": "$0.07"
+                                                "tokens": "847,739",
+                                                "cost": "$0.08"
                                     }
                         ]
             },
@@ -511,14 +511,18 @@
 
         async function loadData() {
             try {
-                const response = await fetch(`${API_URL}/mc/data`);
+                // Fetch from the local JSON file which we know is updated!
+                // Add a cache-buster query param
+                const response = await fetch("/mc-data.json?v=" + Date.now());
                 if (!response.ok) return;
                 const serverData = await response.json();
-                if (serverData && serverData.system && serverData.system.sessions > 0) {
-                    state = { ...state, ...serverData };
+                if (serverData && serverData.system) {
+                    state = serverData;
                 }
                 renderDashboard();
-            } catch (e) {}
+            } catch (e) {
+                console.error("Failed to load mc-data.json:", e);
+            }
         }
 
         function renderDashboard() {
