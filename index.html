@@ -270,13 +270,13 @@
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 1.5rem;">
                         <div>
                             <div style="font-size: 0.7rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 1px;">Daily Tokens</div>
-                            <div style="font-size: 1.75rem; font-weight: 700; margin: 0.25rem 0; color: var(--text-primary);">145,200</div>
-                            <div style="font-size: 0.7rem; color: var(--text-secondary);">Weekly Consumption (235)</div>
+                            <div id="m-daily-tokens" style="font-size: 1.75rem; font-weight: 700; margin: 0.25rem 0; color: var(--text-primary);">0</div>
+                            <div id="m-weekly-tokens" style="font-size: 0.7rem; color: var(--text-secondary);">Weekly Consumption (0)</div>
                         </div>
                         <div>
                             <div style="font-size: 0.7rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 1px;">Total Cost</div>
-                            <div style="font-size: 1.75rem; font-weight: 700; margin: 0.25rem 0; color: var(--text-primary);">$12.84</div>
-                            <div style="font-size: 0.7rem; color: var(--warning);">42% of 2M Alert</div>
+                            <div id="m-total-cost-kpi" style="font-size: 1.75rem; font-weight: 700; margin: 0.25rem 0; color: var(--text-primary);">$0.00</div>
+                            <div id="m-cost-alert" style="font-size: 0.7rem; color: var(--warning);">Budget Monitoring Active</div>
                         </div>
                     </div>
 
@@ -288,22 +288,8 @@
                             <span style="font-size: 0.65rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 1px; text-align: right;">Tokens</span>
                             <span style="font-size: 0.65rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 1px; text-align: right;">Cost</span>
                         </div>
-                        <div style="display: flex; flex-direction: column; gap: 0.5rem;">
-                            <div style="display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 1rem; font-size: 0.8rem; padding-bottom: 0.4rem; border-bottom: 1px solid rgba(255,255,255,0.02);">
-                                <span style="color: var(--text-primary);">google/gemini-3-flash...</span>
-                                <span style="text-align: right; color: var(--text-secondary);">680,000</span>
-                                <span style="text-align: right; color: var(--accent); font-weight: 600;">$10.20</span>
-                            </div>
-                            <div style="display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 1rem; font-size: 0.8rem; padding-bottom: 0.4rem; border-bottom: 1px solid rgba(255,255,255,0.02);">
-                                <span style="color: var(--text-primary);">ollama/mistral-nemo</span>
-                                <span style="text-align: right; color: var(--text-secondary);">120,500</span>
-                                <span style="text-align: right; color: var(--success); font-weight: 600;">Free</span>
-                            </div>
-                            <div style="display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 1rem; font-size: 0.8rem;">
-                                <span style="color: var(--text-primary);">claude-3-5-sonnet</span>
-                                <span style="text-align: right; color: var(--text-secondary);">40,000</span>
-                                <span style="text-align: right; color: var(--accent); font-weight: 600;">$2.64</span>
-                            </div>
+                        <div id="m-model-breakdown" style="display: flex; flex-direction: column; gap: 0.5rem;">
+                            <!-- Dynamic rows injected by JS -->
                         </div>
                     </div>
                 </div>
@@ -394,7 +380,22 @@
 
     <script>
         const defaultData = {
-            system: { gateway: 'Active', latency: '12ms', tokens: '0.0k', sessions: 65, stale: 6, cost: '$0.000063' },
+            system: {
+                gateway: 'Active',
+                latency: '12ms',
+                tokens: '0.2k',
+                sessions: 64,
+                stale: 5,
+                cost: '$6.3e-05',
+                dailyTokens: '0',
+                weeklyTokens: '235',
+                totalCostKPI: '$0.0',
+                breakdown: [{"model": "google/gemini-3-flash-preview", "tokens": "235", "cost": "$0.0"}]
+            },
+                    { model: 'ollama/mistral-nemo', tokens: '120,500', cost: 'Free' },
+                    { model: 'claude-3-5-sonnet', tokens: '40,000', cost: '$2.64' }
+                ]
+            },
             agents: [
                 { 
                     id: 'cal', name: 'Health Cal', role: 'Expert Fitness & Cycling Coach', 
@@ -407,7 +408,7 @@
                 { 
                     id: 'vicky', name: 'Vicky', role: 'Personal Assistant', 
                     model: 'mistral-nemo', status: 'busy', lastActive: '5m ago', 
-                    desc: 'Versatile personal assistant managing scheduling and communications.', 
+                    desc: 'Versatile personal assistant managing scheduling, communications.', 
                     capabilities: ['Calendar', 'Email', 'Research'], 
                     logs: ['16:08: Drafting response'],
                     performance: 'Highly reliable for admin tasks.'
@@ -452,6 +453,20 @@
             document.getElementById('m-active-sessions').textContent = state.system.sessions;
             document.getElementById('m-stale-sessions').textContent = 'Stale (>24h): ' + (state.system.stale || '0');
             
+            // LLM Metrics Box
+            document.getElementById('m-daily-tokens').textContent = state.system.dailyTokens || '0';
+            document.getElementById('m-weekly-tokens').textContent = 'Weekly Consumption (' + (state.system.weeklyTokens || '0') + ')';
+            document.getElementById('m-total-cost-kpi').textContent = state.system.totalCostKPI || '$0.00';
+            
+            const breakdown = document.getElementById('m-model-breakdown');
+            breakdown.innerHTML = (state.system.breakdown || []).map((b, i) => `
+                <div style="display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 1rem; font-size: 0.8rem; padding-bottom: 0.4rem; border-bottom: ${i === state.system.breakdown.length - 1 ? 'none' : '1px solid rgba(255,255,255,0.02)'};">
+                    <span style="color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${b.model}</span>
+                    <span style="text-align: right; color: var(--text-secondary);">${b.tokens}</span>
+                    <span style="text-align: right; color: ${b.cost === 'Free' ? 'var(--success)' : 'var(--accent)'}; font-weight: 600;">${b.cost}</span>
+                </div>
+            `).join('');
+
             const feed = document.getElementById('activity-feed');
             feed.innerHTML = state.activity.map(a => `<div class="feed-item"><span class="feed-ts">${a.ts}</span><div class="feed-msg">${a.msg}</div></div>`).join('');
         }
