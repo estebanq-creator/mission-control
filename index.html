@@ -389,9 +389,17 @@
         const API_URL = 'http://localhost:8899';
         const defaultData = {
             system: {
-                gateway: 'Active', latency: '12ms', tokens: '0k', sessions: 0, stale: 0, cost: '$0.00',
-                dailyTokens: '0', weeklyTokens: '0', totalCostKPI: '$0.00',
-                modelBreakdown: [], agentBreakdown: []
+                gateway: 'Active',
+                latency: '12ms',
+                tokens: '0.2k',
+                sessions: 64,
+                stale: 5,
+                cost: '$6.3e-05',
+                dailyTokens: '0',
+                weeklyTokens: '235',
+                totalCostKPI: '$0.0',
+                modelBreakdown: [{"model": "gemini-3-flash-preview", "tokens": "235", "cost": "$0.0"}],
+                agentBreakdown: [{"agent": "Cal", "tokens": "1,326,632", "cost": "$0.1"}]
             },
             agents: [], tasks: [], activity: [], cron: [], proactivity: [], notes: ""
         };
