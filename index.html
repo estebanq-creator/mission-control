@@ -129,7 +129,7 @@
 
         .metrics-grid {
             display: grid;
-            grid-template-columns: 2fr 1fr 1fr;
+            grid-template-columns: 2.5fr 1fr;
             gap: 1.5rem;
             margin-bottom: 2.5rem;
         }
@@ -294,12 +294,6 @@
                     </div>
                 </div>
 
-                <div class="metric-card glass fade-in" style="animation-delay: 0.1s;">
-                    <div class="metric-accent" style="background: #a855f7;"></div>
-                    <div class="metric-label">LLM Total Tokens</div>
-                    <div class="metric-value" id="m-token-usage">68.4k</div>
-                    <div class="metric-trend" id="m-total-cost">Cost: $0.000063</div>
-                </div>
                 <div class="metric-card glass fade-in" style="animation-delay: 0.2s;">
                     <div class="metric-accent" style="background: #10b981;"></div>
                     <div class="metric-label">Active Sessions</div>
@@ -448,8 +442,6 @@
         }
 
         function renderDashboard() {
-            document.getElementById('m-token-usage').textContent = state.system.tokens;
-            document.getElementById('m-total-cost').textContent = 'Cost: ' + (state.system.cost || '$0.00');
             document.getElementById('m-active-sessions').textContent = state.system.sessions;
             document.getElementById('m-stale-sessions').textContent = 'Stale (>24h): ' + (state.system.stale || '0');
             
