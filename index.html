@@ -401,7 +401,38 @@
                 modelBreakdown: [{"model": "gemini-3-flash-preview", "tokens": "235", "cost": "$0.0"}],
                 agentBreakdown: [{"agent": "Cal", "tokens": "1,326,632", "cost": "$0.1"}]
             },
-            agents: [], tasks: [], activity: [], cron: [], proactivity: [], notes: ""
+            agents: [
+                { 
+                    id: 'cal', name: 'Health Cal', role: 'Expert Fitness & Cycling Coach', 
+                    model: 'gemini-3-flash-preview', status: 'online', lastActive: 'Just now', 
+                    desc: 'Expert fitness, nutrition, and cycling coach focused on metrics and habits.', 
+                    capabilities: ['Strava Analysis', 'Nutrition', 'Workouts'], 
+                    logs: ['16:04: Heartbeat OK', '15:55: Processed brief'],
+                    performance: 'High efficiency.'
+                },
+                { 
+                    id: 'vicky', name: 'Vicky', role: 'Personal Assistant', 
+                    model: 'mistral-nemo', status: 'busy', lastActive: '5m ago', 
+                    desc: 'Versatile personal assistant managing scheduling and communications.', 
+                    capabilities: ['Calendar', 'Email', 'Research'], 
+                    logs: ['16:08: Drafting response'],
+                    performance: 'Highly reliable.'
+                }
+            ],
+            tasks: [],
+            activity: [
+                { ts: '18:45', msg: 'Updated LLM Metrics module in dashboard.' },
+                { ts: '16:35', msg: 'System automation: Hourly stats sync enabled.' }
+            ],
+            cron: [
+                { id: 1, name: 'Morning Brief', frequency: 'Daily 8AM', last: '2026-03-03 08:00', next: '2026-03-04 08:00', status: 'success' },
+                { id: 2, name: 'Stats Sync', frequency: 'Hourly', last: '2026-03-03 20:00', next: '2026-03-03 21:00', status: 'success' }
+            ],
+            proactivity: [
+                { ts: '20:00', msg: 'Completed hourly dashboard stats update.' },
+                { ts: '12:00', msg: 'Completed daily security audit.' }
+            ],
+            notes: ""
         };
 
         let state = JSON.parse(localStorage.getItem('openclaw_mission_control')) || defaultData;
@@ -426,23 +457,38 @@
         }
 
         async function loadData() {
+            console.log("Attempting to load data...");
             try {
                 const response = await fetch(`${API_URL}/mc/data`);
+                if (!response.ok) {
+                    console.error(`Failed to load data: ${response.status} ${response.statusText}`);
+                    console.warn("Local server data unavailable.");
+                    return; // Stop if fetch failed
+                }
                 const serverData = await response.json();
+                console.log("Loaded data from server:", serverData);
                 state = { ...state, ...serverData };
-                saveState(false); // Update local storage but don't loop POST
+                saveState(false);
                 renderDashboard();
-            } catch (e) { console.warn("Local server data unavailable."); }
+            } catch (e) { console.warn("Local server data unavailable (fetch error):", e); }
         }
 
         async function backupData() {
+            console.log("Attempting to backup state...");
             try {
-                await fetch(`${API_URL}/mc/data`, {
+                const response = await fetch(`${API_URL}/mc/data`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(state)
                 });
-            } catch (e) { console.error("Backup failed."); }
+                if (!response.ok) {
+                    console.error(`Backup failed: ${response.status} ${response.statusText}`);
+                } else {
+                    console.log("Backup successful.");
+                }
+            } catch (e) {
+                console.error("Backup fetch failed:", e);
+            }
         }
 
         async function logToActivity(msg) {
