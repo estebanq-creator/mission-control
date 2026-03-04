@@ -494,7 +494,11 @@
             "notes": ""
 };
 
-        let state = JSON.parse(localStorage.getItem('openclaw_mission_control')) || defaultData;
+        
+        // Force refresh from embedded defaultData to clear broken localStorage
+        let state = defaultData;
+        console.log("State initialized from fresh defaultData.");
+
 
         // 1. Connectivity & Sync
         async function syncServer() {
