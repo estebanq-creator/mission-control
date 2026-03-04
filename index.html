@@ -392,8 +392,8 @@
                         "gateway": "Active",
                         "latency": "12ms",
                         "tokens": "0.2k",
-                        "sessions": 64,
-                        "stale": 5,
+                        "sessions": 65,
+                        "stale": 7,
                         "cost": "$6.3e-05",
                         "dailyTokens": "0",
                         "weeklyTokens": "235",
@@ -408,7 +408,7 @@
                         "agentBreakdown": [
                                     {
                                                 "agent": "Cal",
-                                                "tokens": "758,261",
+                                                "tokens": "806,037",
                                                 "cost": "$0.07"
                                     }
                         ]
@@ -713,6 +713,7 @@
         setInterval(fetchWeather, 600000); // 10 mins
         
         updateClock();
+        renderDashboard(); // Initial render from defaultData
         syncServer();
         loadData();
         fetchWeather();
