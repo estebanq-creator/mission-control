@@ -386,14 +386,14 @@
     <div id="agent-panel" class="slide-panel glass"><div id="agent-panel-content"></div></div>
 
     <script>
-        const API_URL = 'http://localhost:8899';
+        const API_URL = "http://localhost:8899";
         const defaultData = {
             "system": {
                         "gateway": "Active",
                         "latency": "12ms",
                         "tokens": "0.2k",
-                        "sessions": 65,
-                        "stale": 7,
+                        "sessions": 64,
+                        "stale": 6,
                         "cost": "$6.3e-05",
                         "dailyTokens": "0",
                         "weeklyTokens": "235",
@@ -408,7 +408,7 @@
                         "agentBreakdown": [
                                     {
                                                 "agent": "Cal",
-                                                "tokens": "806,037",
+                                                "tokens": "806,149",
                                                 "cost": "$0.07"
                                     }
                         ]
@@ -494,229 +494,83 @@
             "notes": ""
 };
 
-        
-        // Force refresh from embedded defaultData to clear broken localStorage
         let state = defaultData;
-        console.log("State initialized from fresh defaultData.");
 
-
-        // 1. Connectivity & Sync
         async function syncServer() {
             try {
                 const response = await fetch(`${API_URL}/mc/status`);
                 const status = await response.json();
-                
-                if (status.status === 'online') {
-                    document.getElementById('status-dot-global').style.background = 'var(--success)';
-                    document.getElementById('status-dot-global').style.boxShadow = '0 0 8px var(--success)';
-                    document.getElementById('cron-engine-status').className = 'status-badge online';
-                    document.getElementById('cron-engine-status').innerHTML = '<div class="status-dot"></div> ENGINE: PORT 8899 ONLINE';
+                if (status.status === "online") {
+                    document.getElementById("status-dot-global").style.background = "var(--success)";
+                    document.getElementById("status-dot-global").style.boxShadow = "0 0 8px var(--success)";
                 }
             } catch (e) {
-                document.getElementById('status-dot-global').style.background = 'var(--danger)';
-                document.getElementById('cron-engine-status').className = 'status-badge offline';
-                document.getElementById('cron-engine-status').innerHTML = '<div class="status-dot"></div> ENGINE: PORT 8899 OFFLINE';
+                document.getElementById("status-dot-global").style.background = "var(--danger)";
             }
         }
 
         async function loadData() {
-            console.log("Attempting to load data...");
             try {
                 const response = await fetch(`${API_URL}/mc/data`);
-                if (!response.ok) {
-                    console.error(`Failed to load data: ${response.status} ${response.statusText}`);
-                    console.warn("Local server data unavailable.");
-                    return; // Stop if fetch failed
-                }
+                if (!response.ok) return;
                 const serverData = await response.json();
-                console.log("Loaded data from server:", serverData);
                 if (serverData && serverData.system && serverData.system.sessions > 0) {
                     state = { ...state, ...serverData };
-                    saveState(false);
                 }
                 renderDashboard();
-            } catch (e) { console.warn("Local server data unavailable (fetch error):", e); }
-        }
-
-        async function backupData() {
-            console.log("Attempting to backup state...");
-            try {
-                const response = await fetch(`${API_URL}/mc/data`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(state)
-                });
-                if (!response.ok) {
-                    console.error(`Backup failed: ${response.status} ${response.statusText}`);
-                } else {
-                    console.log("Backup successful.");
-                }
-            } catch (e) {
-                console.error("Backup fetch failed:", e);
-            }
-        }
-
-        async function logToActivity(msg) {
-            const entry = { ts: new Date().toLocaleTimeString().slice(0,5), msg };
-            state.activity.unshift(entry);
-            saveState();
-            renderDashboard();
-            try {
-                await fetch(`${API_URL}/mc/activity`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: entry
-                });
             } catch (e) {}
-        }
-
-        function submitManualLog() {
-            const input = document.getElementById('manual-log-input');
-            if(!input.value) return;
-            logToActivity(`[MANUAL] ${input.value}`);
-            input.value = '';
-        }
-
-        async function fetchWeather() {
-            try {
-                const response = await fetch(`${API_URL}/mc/weather?city=New York`);
-                const data = await response.json();
-                const temp = data.current_condition[0].temp_F;
-                const desc = data.current_condition[0].weatherDesc[0].value;
-                document.getElementById('weather-display').textContent = `NYC: ${temp}°F • ${desc}`;
-            } catch (e) {}
-        }
-
-        function saveState(backup = true) {
-            localStorage.setItem('openclaw_mission_control', JSON.stringify(state));
-            if (backup) backupData();
-        }
-
-        // 2. Tab Logic
-        function showTab(tabId) {
-            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-            document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
-            document.getElementById(tabId).classList.add('active');
-            document.querySelector(`[onclick="showTab('${tabId}')"]`).classList.add('active');
-            renderTab(tabId);
-        }
-
-        function renderTab(tabId) {
-            if (tabId === 'dashboard') renderDashboard();
-            if (tabId === 'agents') { renderAgentGrid(); renderCronGrid(); renderProactivityLog(); }
         }
 
         function renderDashboard() {
-            document.getElementById('m-active-sessions').textContent = state.system.sessions;
-            document.getElementById('m-stale-sessions').textContent = 'Stale (>24h): ' + (state.system.stale || '0');
-            document.getElementById('m-daily-tokens').textContent = state.system.dailyTokens || '0';
-            document.getElementById('m-weekly-tokens').textContent = 'Weekly Consumption (' + (state.system.weeklyTokens || '0') + ')';
-            document.getElementById('m-total-cost-kpi').textContent = state.system.totalCostKPI || '$0.00';
+            if (!state || !state.system) return;
+            document.getElementById("m-active-sessions").textContent = state.system.sessions;
+            document.getElementById("m-stale-sessions").textContent = "Stale (>24h): " + (state.system.stale || "0");
+            document.getElementById("m-daily-tokens").textContent = state.system.dailyTokens || "0";
+            document.getElementById("m-weekly-tokens").textContent = "Weekly Consumption (" + (state.system.weeklyTokens || "0") + ")";
+            document.getElementById("m-total-cost-kpi").textContent = state.system.totalCostKPI || "$0.00";
             
-            const modelEl = document.getElementById('m-model-breakdown');
-            modelEl.innerHTML = (state.system.modelBreakdown || []).map(b => `
-                <div style="display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 0.5rem; font-size: 0.75rem; border-bottom: 1px solid rgba(255,255,255,0.02); padding-bottom: 2px;">
-                    <span style="color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${b.model}</span>
-                    <span style="text-align: right; color: var(--text-secondary);">${b.tokens}</span>
-                    <span style="text-align: right; color: var(--accent);">${b.cost}</span>
-                </div>
-            `).join('');
-
-            const agentEl = document.getElementById('m-agent-breakdown');
-            agentEl.innerHTML = (state.system.agentBreakdown || []).map(b => `
-                <div style="display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 0.5rem; font-size: 0.75rem; border-bottom: 1px solid rgba(255,255,255,0.02); padding-bottom: 2px;">
-                    <span style="color: var(--text-primary);">${b.agent}</span>
-                    <span style="text-align: right; color: var(--text-secondary);">${b.tokens}</span>
-                    <span style="text-align: right; color: var(--accent);">${b.cost}</span>
-                </div>
-            `).join('');
-
-            const feed = document.getElementById('activity-feed');
-            feed.innerHTML = state.activity.map(a => `<div class="feed-item"><span class="feed-ts">${a.ts}</span><div class="feed-msg">${a.msg}</div></div>`).join('');
-        }
-
-        function renderAgentGrid() {
-            const grid = document.getElementById('agent-grid');
-            grid.innerHTML = (state.agents || []).map(agent => `
-                <div class="glass agent-card-v2 fade-in" onclick="openAgentPanel('${agent.id}')">
-                    <div class="agent-status-v2">
-                        <div style="width:8px; height:8px; border-radius:50%; background:${agent.status==='online'?'var(--success)':'var(--warning)'}"></div>
-                        ${agent.status.toUpperCase()}
+            const modelEl = document.getElementById("m-model-breakdown");
+            if (modelEl) {
+                modelEl.innerHTML = (state.system.modelBreakdown || []).map(b => `
+                    <div style="display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 0.5rem; font-size: 0.75rem;">
+                        <span>${b.model}</span>
+                        <span style="text-align: right;">${b.tokens}</span>
+                        <span style="text-align: right;">${b.cost}</span>
                     </div>
-                    <div style="font-weight:700; font-size:1.1rem;">${agent.name}</div>
-                    <div style="font-size:0.75rem; color:var(--accent); text-transform:uppercase;">${agent.role}</div>
-                    <div class="agent-id-tag">${agent.model}</div>
-                </div>
-            `).join('');
+                `).join("");
+            }
+
+            const agentEl = document.getElementById("m-agent-breakdown");
+            if (agentEl) {
+                agentEl.innerHTML = (state.system.agentBreakdown || []).map(b => `
+                    <div style="display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 0.5rem; font-size: 0.75rem;">
+                        <span>${b.agent}</span>
+                        <span style="text-align: right;">${b.tokens}</span>
+                        <span style="text-align: right;">${b.cost}</span>
+                    </div>
+                `).join("");
+            }
+
+            const feed = document.getElementById("activity-feed");
+            if (feed) {
+                feed.innerHTML = (state.activity || []).map(a => `<div class="feed-item"><span>${a.ts}</span><div>${a.msg}</div></div>`).join("");
+            }
         }
 
-        function renderCronGrid() {
-            const grid = document.getElementById('cron-grid');
-            grid.innerHTML = (state.cron || []).map(job => `
-                <div class="glass" style="padding: 1.25rem;">
-                    <div style="font-weight: 700;">${job.name}</div>
-                    <div style="font-size: 0.7rem; color: var(--accent);">${job.frequency}</div>
-                    <div style="font-size: 0.65rem; color: var(--text-secondary); margin-top: 8px;">Last: ${job.last}</div>
-                </div>
-            `).join('');
-        }
-
-        function renderProactivityLog() {
-            const log = document.getElementById('proactivity-log');
-            log.innerHTML = (state.proactivity || []).map(p => `
-                <div class="decision-item" style="border-left-color: var(--success); padding: 0.75rem;">
-                    <span class="decision-ts">${p.ts}</span>
-                    <div style="font-size: 0.8rem;">${p.msg}</div>
-                </div>
-            `).join('');
-        }
-
-        function openAgentPanel(id) {
-            const agent = state.agents.find(a => a.id === id);
-            document.getElementById('agent-panel-content').innerHTML = `
-                <h2 style="font-weight:700;">${agent.name}</h2>
-                <div class="agent-id-tag" style="margin-bottom:1.5rem;">${agent.model}</div>
-                <h4 class="section-title">Description</h4><p style="font-size:0.9rem; margin-bottom:1.5rem;">${agent.desc}</p>
-                <button class="btn" style="width:100%; margin-top:2rem;" onclick="openAgentTaskModal('${agent.id}')">Send Task Request</button>
-            `;
-            document.getElementById('agent-panel').classList.add('active');
-            document.getElementById('panel-overlay').classList.add('active');
-        }
-
-        function closePanel() {
-            document.getElementById('agent-panel').classList.remove('active');
-            document.getElementById('panel-overlay').classList.remove('active');
-        }
-
-        function openAgentTaskModal(id) {
-            document.getElementById('at-input-agent-id').value = id;
-            document.getElementById('modal-agent-task').style.display = 'flex';
-        }
-
-        function dispatchAgentTask() {
-            const id = document.getElementById('at-input-agent-id').value;
-            const req = document.getElementById('at-input-request').value;
-            if(!req) return;
-            logToActivity(`[AGENT TASK] to ${id}: ${req}`);
-            document.getElementById('modal-agent-task').style.display = 'none';
+        function showTab(tabId) {
+            document.querySelectorAll(".tab-content").forEach(t => t.classList.remove("active"));
+            document.getElementById(tabId).classList.add("active");
+            renderDashboard();
         }
 
         function updateClock() {
-            const now = new Date();
-            document.getElementById('header-clock').textContent = now.toLocaleTimeString();
+            document.getElementById("header-clock").textContent = new Date().toLocaleTimeString();
         }
 
-        // Initialize
         setInterval(updateClock, 1000);
-        setInterval(syncServer, 5000);
-        setInterval(backupData, 300000); // 5 mins
-        setInterval(fetchWeather, 600000); // 10 mins
-        
         updateClock();
-        renderDashboard(); // Initial render from defaultData
-        syncServer();
+        renderDashboard();
         loadData();
-        fetchWeather();
-    </script>
+</script>
 </body>
 </html>

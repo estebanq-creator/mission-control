@@ -3,8 +3,8 @@
     "gateway": "Active",
     "latency": "12ms",
     "tokens": "0.2k",
-    "sessions": 65,
-    "stale": 7,
+    "sessions": 64,
+    "stale": 6,
     "cost": "$6.3e-05",
     "dailyTokens": "0",
     "weeklyTokens": "235",
@@ -19,7 +19,7 @@
     "agentBreakdown": [
       {
         "agent": "Cal",
-        "tokens": "806,037",
+        "tokens": "806,149",
         "cost": "$0.07"
       }
     ]
