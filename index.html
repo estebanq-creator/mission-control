@@ -282,14 +282,22 @@
 
                     <div style="height: 1px; background: var(--border-subtle); margin-bottom: 1.5rem;"></div>
 
-                    <div>
-                        <div style="display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 1rem; margin-bottom: 0.75rem;">
-                            <span style="font-size: 0.65rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 1px;">Breakdown</span>
-                            <span style="font-size: 0.65rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 1px; text-align: right;">Tokens</span>
-                            <span style="font-size: 0.65rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 1px; text-align: right;">Cost</span>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+                        <div>
+                            <div style="display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 0.5rem; margin-bottom: 0.75rem;">
+                                <span style="font-size: 0.6rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 1px;">Model</span>
+                                <span style="font-size: 0.6rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 1px; text-align: right;">Tokens</span>
+                                <span style="font-size: 0.6rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 1px; text-align: right;">Cost</span>
+                            </div>
+                            <div id="m-model-breakdown" style="display: flex; flex-direction: column; gap: 0.5rem;"></div>
                         </div>
-                        <div id="m-model-breakdown" style="display: flex; flex-direction: column; gap: 0.5rem;">
-                            <!-- Dynamic rows injected by JS -->
+                        <div>
+                            <div style="display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 0.5rem; margin-bottom: 0.75rem;">
+                                <span style="font-size: 0.6rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 1px;">Agent</span>
+                                <span style="font-size: 0.6rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 1px; text-align: right;">Tokens</span>
+                                <span style="font-size: 0.6rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 1px; text-align: right;">Cost</span>
+                            </div>
+                            <div id="m-agent-breakdown" style="display: flex; flex-direction: column; gap: 0.5rem;"></div>
                         </div>
                     </div>
                 </div>
@@ -297,7 +305,7 @@
                 <div class="metric-card glass fade-in" style="animation-delay: 0.2s;">
                     <div class="metric-accent" style="background: #10b981;"></div>
                     <div class="metric-label">Active Sessions</div>
-                    <div class="metric-value" id="m-active-sessions">77</div>
+                    <div class="metric-value" id="m-active-sessions">0</div>
                     <div class="metric-trend" id="m-stale-sessions" style="color: var(--text-secondary);">Stale (>24h): 0</div>
                 </div>
             </div>
@@ -378,54 +386,42 @@
                 gateway: 'Active',
                 latency: '12ms',
                 tokens: '0.2k',
-                sessions: 64,
-                stale: 5,
+                sessions: 65,
+                stale: 6,
                 cost: '$6.3e-05',
                 dailyTokens: '0',
                 weeklyTokens: '235',
                 totalCostKPI: '$0.0',
-                breakdown: [{"model": "google/gemini-3-flash-preview", "tokens": "235", "cost": "$0.0"}]
-            },
-                    { model: 'ollama/mistral-nemo', tokens: '120,500', cost: 'Free' },
-                    { model: 'claude-3-5-sonnet', tokens: '40,000', cost: '$2.64' }
-                ]
+                modelBreakdown: [{"model": "gemini-3-flash-preview", "tokens": "235", "cost": "$0.0"}],
+                agentBreakdown: [{"agent": "Cal", "tokens": "1,207,995", "cost": "$0.12"}]
             },
             agents: [
                 { 
-                    id: 'cal', name: 'Health Cal', role: 'Expert Fitness & Cycling Coach', 
+                    id: 'cal', name: 'Health Cal', role: 'Expert Fitness Coach', 
                     model: 'gemini-3-flash-preview', status: 'online', lastActive: 'Just now', 
-                    desc: 'Expert fitness, nutrition, and cycling coach focused on metrics and habits. Specialized in Strava data analysis.', 
-                    capabilities: ['Strava Analysis', 'Nutrition', 'Workouts'], 
-                    logs: ['16:04: Heartbeat OK', '15:55: Processed brief'],
-                    performance: 'High efficiency; latency < 2s.'
+                    desc: 'Expert fitness, nutrition, and cycling coach.', 
+                    capabilities: ['Strava', 'Nutrition'], logs: [], performance: 'High efficiency.'
                 },
                 { 
                     id: 'vicky', name: 'Vicky', role: 'Personal Assistant', 
                     model: 'mistral-nemo', status: 'busy', lastActive: '5m ago', 
-                    desc: 'Versatile personal assistant managing scheduling, communications.', 
-                    capabilities: ['Calendar', 'Email', 'Research'], 
-                    logs: ['16:08: Drafting response'],
-                    performance: 'Highly reliable for admin tasks.'
+                    desc: 'Versatile personal assistant.', capabilities: ['Admin'], 
+                    logs: [], performance: 'Reliable.'
                 }
             ],
             tasks: [],
-            activity: [
-                { ts: '18:45', msg: 'Updated LLM Metrics module in dashboard.' },
-                { ts: '16:35', msg: 'System automation: Hourly stats sync enabled.' }
-            ],
+            activity: [{ ts: '19:20', msg: 'Updated Mission Control agent breakdown.' }],
             cron: [
                 { id: 1, name: 'Morning Brief', frequency: 'Daily 8AM', last: '2026-03-03 08:00', next: '2026-03-04 08:00', status: 'success' },
-                { id: 2, name: 'Stats Sync', frequency: 'Hourly', last: '2026-03-03 18:00', next: '2026-03-03 19:00', status: 'success' }
+                { id: 2, name: 'Stats Sync', frequency: 'Hourly', last: '2026-03-03 19:00', next: '2026-03-03 20:00', status: 'success' }
             ],
             proactivity: [
-                { ts: '18:00', msg: 'Completed hourly dashboard stats update.' },
-                { ts: '12:00', msg: 'Completed daily security audit.' }
+                { ts: '19:00', msg: 'Completed hourly dashboard stats update.' }
             ],
             notes: ""
         };
 
         let state = JSON.parse(localStorage.getItem('openclaw_mission_control')) || defaultData;
-
         function saveState() { localStorage.setItem('openclaw_mission_control', JSON.stringify(state)); }
 
         function showTab(tabId) {
@@ -444,18 +440,25 @@
         function renderDashboard() {
             document.getElementById('m-active-sessions').textContent = state.system.sessions;
             document.getElementById('m-stale-sessions').textContent = 'Stale (>24h): ' + (state.system.stale || '0');
-            
-            // LLM Metrics Box
             document.getElementById('m-daily-tokens').textContent = state.system.dailyTokens || '0';
             document.getElementById('m-weekly-tokens').textContent = 'Weekly Consumption (' + (state.system.weeklyTokens || '0') + ')';
             document.getElementById('m-total-cost-kpi').textContent = state.system.totalCostKPI || '$0.00';
             
-            const breakdown = document.getElementById('m-model-breakdown');
-            breakdown.innerHTML = (state.system.breakdown || []).map((b, i) => `
-                <div style="display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 1rem; font-size: 0.8rem; padding-bottom: 0.4rem; border-bottom: ${i === state.system.breakdown.length - 1 ? 'none' : '1px solid rgba(255,255,255,0.02)'};">
+            const modelEl = document.getElementById('m-model-breakdown');
+            modelEl.innerHTML = (state.system.modelBreakdown || []).map(b => `
+                <div style="display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 0.5rem; font-size: 0.75rem; border-bottom: 1px solid rgba(255,255,255,0.02); padding-bottom: 2px;">
                     <span style="color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${b.model}</span>
                     <span style="text-align: right; color: var(--text-secondary);">${b.tokens}</span>
-                    <span style="text-align: right; color: ${b.cost === 'Free' ? 'var(--success)' : 'var(--accent)'}; font-weight: 600;">${b.cost}</span>
+                    <span style="text-align: right; color: var(--accent);">${b.cost}</span>
+                </div>
+            `).join('');
+
+            const agentEl = document.getElementById('m-agent-breakdown');
+            agentEl.innerHTML = (state.system.agentBreakdown || []).map(b => `
+                <div style="display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 0.5rem; font-size: 0.75rem; border-bottom: 1px solid rgba(255,255,255,0.02); padding-bottom: 2px;">
+                    <span style="color: var(--text-primary);">${b.agent}</span>
+                    <span style="text-align: right; color: var(--text-secondary);">${b.tokens}</span>
+                    <span style="text-align: right; color: var(--accent);">${b.cost}</span>
                 </div>
             `).join('');
 
@@ -505,7 +508,6 @@
                 <h2 style="font-weight:700;">${agent.name}</h2>
                 <div class="agent-id-tag" style="margin-bottom:1.5rem;">${agent.model}</div>
                 <h4 class="section-title">Description</h4><p style="font-size:0.9rem; margin-bottom:1.5rem;">${agent.desc}</p>
-                <h4 class="section-title">Performance</h4><p style="font-size:0.85rem; color:var(--accent);">${agent.performance}</p>
                 <button class="btn" style="width:100%; margin-top:2rem;" onclick="openAgentTaskModal('${agent.id}')">Send Task Request</button>
             `;
             document.getElementById('agent-panel').classList.add('active');
